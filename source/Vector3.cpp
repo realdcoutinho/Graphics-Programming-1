@@ -1,7 +1,6 @@
 #include "Vector3.h"
 
 #include <cassert>
-
 #include "Vector4.h"
 #include <cmath>
 
@@ -46,15 +45,19 @@ namespace dae {
 	float Vector3::Dot(const Vector3& v1, const Vector3& v2)
 	{
 		//todo W1
-		assert(false && "Not Implemented Yet");
-		return {};
+		//assert(false && sfdz);
+		return {v1.x * v2.x + v1.y * v2.y + v1.z *v2.z};
 	}
 
 	Vector3 Vector3::Cross(const Vector3& v1, const Vector3& v2)
 	{
 		//todo W1
-		assert(false && "Not Implemented Yet");
-		return {};
+
+		//assert(false && "Not Implemented Yet");
+		return { (v1.y * v2.z - v1.z * v2.y), 
+				 (v1.x * v2.z - v1.z * v2.x),
+				 (v1.x * v2.y - v1.y * v2.x)
+				};
 	}
 
 	Vector3 Vector3::Project(const Vector3& v1, const Vector3& v2)
