@@ -3,6 +3,7 @@
 #include "Material.h"
 #include <iostream>
 
+
 namespace dae {
 
 #pragma region Base Scene
@@ -127,7 +128,8 @@ namespace dae {
 		AddPlane({ 0.f, 75.f, 0.f }, { 0.f, -1.f,0.f }, matId_Solid_Yellow);
 		AddPlane({ 0.f, 0.f, 125.f }, { 0.f, 0.f,-1.f }, matId_Solid_Magenta);
 
-#pragma region w1
+	#pragma region w1
+
 		float dotResult{};
 		dotResult = Vector3::Dot(Vector3::UnitX, Vector3::UnitX); //1
 		dotResult = Vector3::Dot(Vector3::UnitX, -Vector3::UnitX); //-1
@@ -137,9 +139,12 @@ namespace dae {
 		crossResult = Vector3::Cross(Vector3::UnitX, Vector3::UnitY);
 		crossResult = Vector3::Cross(Vector3::UnitY, Vector3::UnitZ);
 
-		Ray hitRay{ {0, 0, 0},  };
 
-#pragma endregion w1
+
+
+
+
+	#pragma endregion w1
 
 
 	}

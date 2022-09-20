@@ -31,19 +31,35 @@ void Renderer::Render(Scene* pScene) const
 	{
 		for (int py{}; py < m_Height; ++py)
 		{
-			float gradient = px / static_cast<float>(m_Width);
-			gradient += py / static_cast<float>(m_Width);
-			gradient /= 2.0f;
+			//float gradient = px / static_cast<float>(m_Width);
+			//gradient += py / static_cast<float>(m_Width);
+			//gradient /= 2.0f;
 
-			ColorRGB finalColor{ gradient, gradient, gradient };
+			//ColorRGB finalColor{ gradient, gradient, gradient };
 
-			//Update Color in Buffer
-			finalColor.MaxToOne();
+			////Update Color in Buffer
+			//finalColor.MaxToOne();
 
-			m_pBufferPixels[px + (py * m_Width)] = SDL_MapRGB(m_pBuffer->format,
-				static_cast<uint8_t>(finalColor.r * 255),
-				static_cast<uint8_t>(finalColor.g * 255),
-				static_cast<uint8_t>(finalColor.b * 255));
+		float screenWidth	{640.0f};
+		float screenHeigh	{480.0f};
+		float aspectRatio	{ screenWidth / screenHeigh };
+
+		float cX{ (((2 * (px + 0.5f)) / screenWidth) - 1) * aspectRatio };
+		float cY{ 1 - (2 * py / screenHeigh) };
+
+
+		Vector3 rayDirection{ cX, cY, 1 };
+		Vector3 normalizedRayDirection{ rayDirection.Normalized() };
+
+		Vector3 cameraOrigin{ 0, 0, 0 };
+
+		Ray hitRay{ cameraOrigin, normalizedRayDirection };
+		ColorRGB finalColor{ normalizedRayDirection.x, normalizedRayDirection.y, normalizedRayDirection.z };
+
+		m_pBufferPixels[px + (py * m_Width)] = SDL_MapRGB(m_pBuffer->format,
+			static_cast<uint8_t>(finalColor.r * 255),
+			static_cast<uint8_t>(finalColor.g * 255),
+			static_cast<uint8_t>(finalColor.b * 255));
 		}
 	}
 
