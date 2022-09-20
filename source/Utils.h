@@ -13,8 +13,50 @@ namespace dae
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//todo W1
-			assert(false && "No Implemented Yet!");
-			return false;
+
+			Vector3 center{ sphere.origin };
+			float cX{ center.x };
+			float cY{ center.y };
+			float cZ{ center.z };
+
+			//Quadratic equation A B and C
+			float A{ Vector3::Dot(ray.direction, ray.direction) };
+			float B{ Vector3::Dot(2*ray.direction, ray.origin - sphere.origin)};
+			float C{ Vector3::Dot(ray.origin - sphere.origin,  ray.origin - sphere.origin) - powf(sphere.radius, 2)};
+
+			float discriminant{ powf(B, 2) - 4 * A * C};
+
+			float tMax{ray.max};
+			float tMin{ray.min};
+
+
+			if (discriminant < 0)
+			{
+				//ray does not intersect
+				//return false;
+			}
+			if(discriminant == 0)
+			{
+				//ray touches the sphere in one point
+			}
+			if (discriminant > 0)
+			{
+				//ray touches intersects the sphere in two points
+				float t{ (-B - sqrt(discriminant)) / 2 * A };
+				Vector3 p{ ray.origin + t*ray.direction};
+				
+				Vector3 vectorSphereCenterToP{ p.x - sphere.origin.x, p.y - sphere.origin.y, p.z - sphere.origin.z };
+				//Vector3 vectorSphereCenterToP{ p.x - sphere.origin.x, p.y - sphere.origin.y, p.z - sphere.origin.z };
+				
+				hitRecord.didHit = true;
+				hitRecord.materialIndex = sphere.materialIndex;
+				hitRecord.normal = vectorSphereCenterToP.Normalized();
+				hitRecord.origin = p;
+				hitRecord.t = t;
+				return hitRecord.didHit;
+			}
+			//return false;
+			
 		}
 
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)

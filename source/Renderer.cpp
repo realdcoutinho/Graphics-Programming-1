@@ -9,6 +9,7 @@
 #include "Material.h"
 #include "Scene.h"
 #include "Utils.h"
+#include <iostream>
 
 using namespace dae;
 
@@ -34,32 +35,53 @@ void Renderer::Render(Scene* pScene) const
 			//float gradient = px / static_cast<float>(m_Width);
 			//gradient += py / static_cast<float>(m_Width);
 			//gradient /= 2.0f;
-
 			//ColorRGB finalColor{ gradient, gradient, gradient };
-
 			////Update Color in Buffer
 			//finalColor.MaxToOne();
 
-		float screenWidth	{640.0f};
-		float screenHeigh	{480.0f};
+
+		//variables for the aspect ration
+		float screenWidth	{640.0f}; // m_Width
+		float screenHeigh	{480.0f}; // m_Height
+		//as[ect ration calculation and variable
 		float aspectRatio	{ screenWidth / screenHeigh };
 
-		float cX{ (((2 * (px + 0.5f)) / screenWidth) - 1) * aspectRatio };
-		float cY{ 1 - (2 * py / screenHeigh) };
+		//calculating camera posX and posY based on the given formula
+		float cameraPosX{ (((2 * (px + 0.5f)) / screenWidth) - 1) * aspectRatio };
+		float cameraPosY{ 1 - (2 * py / screenHeigh) };
 
 
-		Vector3 rayDirection{ cX, cY, 1 };
+		//creating a loof vector for the camera
+		Vector3 rayDirection{ cameraPosX, cameraPosY, 1 };
+		//normalazing said vector
 		Vector3 normalizedRayDirection{ rayDirection.Normalized() };
-
+		
+		//CameraOrigin is where the look vector begins
 		Vector3 cameraOrigin{ 0, 0, 0 };
 
 		Ray hitRay{ cameraOrigin, normalizedRayDirection };
 		ColorRGB finalColor{ normalizedRayDirection.x, normalizedRayDirection.y, normalizedRayDirection.z };
 
+
 		m_pBufferPixels[px + (py * m_Width)] = SDL_MapRGB(m_pBuffer->format,
 			static_cast<uint8_t>(finalColor.r * 255),
 			static_cast<uint8_t>(finalColor.g * 255),
 			static_cast<uint8_t>(finalColor.b * 255));
+
+		Ray viewRay(cameraOrigin, normalizedRayDirection);
+		ColorRGB finalColorSphere{255, 0, 0};
+		HitRecord closestHit{};
+
+
+	
+		Sphere testSphere{ {0.0f, 0.0f, 100.0f}, 50.0f, 1 };
+
+		GeometryUtils::HitTest_Sphere(testSphere, viewRay, closestHit);
+
+			if (closestHit.didHit)
+			{
+				finalColorSphere = materials[closestHit.didHit]->Shade();
+			}
 		}
 	}
 
