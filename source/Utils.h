@@ -33,11 +33,12 @@ namespace dae
 			if (discriminant < 0)
 			{
 				//ray does not intersect
-				//return false;
+				return false;
 			}
 			if(discriminant == 0)
 			{
 				//ray touches the sphere in one point
+				return false;
 			}
 			if (discriminant > 0)
 			{
@@ -55,7 +56,7 @@ namespace dae
 				hitRecord.t = t;
 				return hitRecord.didHit;
 			}
-			//return false;
+			return false;
 			
 		}
 
@@ -70,8 +71,36 @@ namespace dae
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//todo W1
-			assert(false && "No Implemented Yet!");
-			return false;
+
+			float t{ Vector3::Dot((plane.origin - ray.origin), plane.normal) / Vector3::Dot(ray.direction, plane.normal) };
+			Vector3 p{ ray.origin + (t * ray.direction) };
+			float pX{ ray.origin.x + (t * ray.direction.x) };
+			float check{ Vector3::Dot(p - plane.origin, plane.normal) };
+
+			float tMax{ ray.max };
+			float tMin{ ray.min };
+
+			
+
+			//if (check == 0)
+			//{
+				if (t >= tMin && t <= tMax)
+				{
+					hitRecord.didHit = true;
+					hitRecord.materialIndex = plane.materialIndex;
+					hitRecord.normal = plane.normal;
+					hitRecord.origin = ray.origin;
+					hitRecord.t = t;
+					return hitRecord.didHit;
+				}
+				return false;
+			//}
+			//return false;
+
+
+			
+			//assert(false && "No Implemented Yet!");
+			//return false;
 		}
 
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray)
