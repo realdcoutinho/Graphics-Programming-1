@@ -82,8 +82,8 @@ namespace dae
 
 			
 
-			//if (check == 0)
-			//{
+			if (check >= -0.1 && check <= 0.1)
+			{
 				if (t >= tMin && t <= tMax)
 				{
 					hitRecord.didHit = true;
@@ -94,7 +94,7 @@ namespace dae
 					return hitRecord.didHit;
 				}
 				return false;
-			//}
+			}
 			//return false;
 
 

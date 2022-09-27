@@ -66,7 +66,7 @@ void Renderer::Render(Scene* pScene) const
 			//CameraOrigin is where the look vector begins
 			Vector3 cameraOrigin{ 0, 0, 0 };
 			Ray hitRay{ cameraOrigin, normalizedRayDirection };
-			Ray viewRay(cameraOrigin, normalizedRayDirection);
+			Ray viewRay(camera.origin, normalizedRayDirection);
 
 
 #pragma region squares render
@@ -151,6 +151,22 @@ void Renderer::Render(Scene* pScene) const
 			//	static_cast<uint8_t>(finalColorPlane.b * 255));
 
 #pragma endregion 2 circles
+
+#pragma region extra
+			Ray viewRayPlane{ {0, 0, 0}, rayDirection };
+			ColorRGB finalColorPlane{};
+
+			HitRecord closesHitPlane{};
+			Plane testPlane{ {0.0f, -50.0f, 0.f}, {0.f, 1.f, 0.f}, 0 };
+
+			GeometryUtils::HitTest_Plane(testPlane, viewRayPlane, closesHitPlane);
+
+			if (closesHitPlane.didHit)
+			{
+				finalColorPlane = materials[closesHitPlane.materialIndex]->Shade();
+			}
+
+#pragma endregion extra 
 		}
 	}
 
