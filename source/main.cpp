@@ -73,6 +73,7 @@ int main(int argc, char* args[])
 
 		//--------- Update ---------
 		pScene->Update(pTimer);
+		pScene->GetCamera().Update(pTimer);
 
 		//--------- Render ---------
 		pRenderer->Render(pScene);

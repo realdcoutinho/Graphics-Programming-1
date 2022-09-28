@@ -20,7 +20,16 @@ namespace dae
 		Vector3 Normalized() const;
 
 		static float Dot(const Vector3& v1, const Vector3& v2);
-		static Vector3 Cross(const Vector3& v1, const Vector3& v2);
+		static Vector3 Cross(const Vector3& v1, const Vector3& v2)
+		{
+			//todo W1
+
+			//assert(false && "Not Implemented Yet");
+			return { (v1.y * v2.z - v2.y * v1.z),
+				(-v1.x * v2.z + v2.x * v1.z),
+				(v1.x * v2.y - v2.x * v1.y)
+			};
+		}
 		static Vector3 Project(const Vector3& v1, const Vector3& v2);
 		static Vector3 Reject(const Vector3& v1, const Vector3& v2);
 		static Vector3 Reflect(const Vector3& v1, const Vector3& v2);

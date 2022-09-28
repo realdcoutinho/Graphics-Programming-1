@@ -114,25 +114,40 @@ namespace dae {
 		return { Vector3::UnitX, Vector3::UnitY, Vector3::UnitZ, t };
 	}
 
-	Matrix Matrix::CreateRotationX(float pitch)
+	inline Matrix Matrix::CreateRotationX(float pitch)
 	{
 		//todo W1
-		assert(false && "Not Implemented Yet");
-		return {};
+		Vector4 line1{ 1, 0, 0, 0 };
+		Vector4 line2{ 0, cosf(pitch), -1 * sinf(pitch), 0 };
+		Vector4 line3{ 0, sinf(pitch), cosf(pitch), 0 };
+		Vector4 line4{ 0, 0, 0, 1 };
+
+		Matrix matrixPitch{ line1, line2, line3, line4 };
+		return matrixPitch;
 	}
 
 	Matrix Matrix::CreateRotationY(float yaw)
 	{
 		//todo W1
-		assert(false && "Not Implemented Yet");
-		return {};
+		Vector4 line1{ cosf(yaw), 0, -1 * sinf(yaw), 0 };
+		Vector4 line2{ 0, 1, 0, 0 };
+		Vector4 line3{ sinf(yaw), 0, cosf(yaw), 0 };
+		Vector4 line4{ 0, 0, 0, 1 };
+
+		Matrix matrixYaw{ line1, line2, line3, line4 };
+		return matrixYaw;
 	}
 
 	Matrix Matrix::CreateRotationZ(float roll)
 	{
 		//todo W1
-		assert(false && "Not Implemented Yet");
-		return {};
+		Vector4 line1{ cosf(roll), sinf(roll), 0, 0 };
+		Vector4 line2{ -1 * sinf(roll), cosf(roll), 0, 0 };
+		Vector4 line3{ 0, 0, 1, 0 };
+		Vector4 line4{ 0, 0, 0, 1 };
+		
+		Matrix matrixRoll{ line1, line2, line3, line4 };
+		return matrixRoll;
 	}
 
 	Matrix Matrix::CreateRotation(const Vector3& r)
