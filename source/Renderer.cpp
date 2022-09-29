@@ -213,7 +213,7 @@ void Renderer::Render(Scene* pScene) const
 	{
 		for (int py{}; py < m_Height; ++py)
 		{
-			//asPect ration calculation and variable
+			//asPect ration calculation and variablesa
 			float aspectRatio{ static_cast<float>(m_Width) / static_cast<float>(m_Height) };
 			float FOV{ tanf(camera.fovAngle * TO_RADIANS / 2) };
 			//calculating camera posX and posY based on the given formula

@@ -2,6 +2,7 @@
 #include <cassert>
 #include <SDL_keyboard.h>
 #include <SDL_mouse.h>
+#include <SDL_events.h>
 
 
 #include "Math.h"
@@ -86,6 +87,14 @@ namespace dae
 			{
 				origin -= up *  cameraVelocity * deltaTime;
 			}
+			if (pKeyboardState[SDL_SCANCODE_UP])
+			{
+				fovAngle +=1.0f;
+			}
+			if (pKeyboardState[SDL_SCANCODE_DOWN])
+			{
+				fovAngle -= 1.0f;
+			}
 
 
 
@@ -106,6 +115,45 @@ namespace dae
 				//}
 
 			}
+
+			//SDL_Event event;
+			//while (SDL_PollEvent(&event))
+			//{
+			//	fovAngle += 1.0f;
+			//	if (event.type == SDL_MOUSEWHEEL)
+			//	{
+			//		std::cout << "ROLLING UP" << '\n';
+			//		if (event.wheel.y > 0) // scroll up
+			//		{
+			//			fovAngle += 1.0f;
+			//			std::cout << "ROLLING UP" << '\n';
+			//			// Put code for handling "scroll up" here!
+			//		}
+			//		else if (event.wheel.y < 0) // scroll down
+			//		{
+			//			std::cout << "ROLLING DOWN" << '\n';
+			//
+			//			fovAngle -= 1.0f;
+			//			// Put code for handling "scroll down" here!
+			//		}
+			//
+			//		if (event.wheel.x > 0) // scroll right
+			//		{
+			//			// ...
+			//		}
+			//		else if (event.wheel.x < 0) // scroll left
+			//		{
+			//			// ...
+			//		}
+			//	}
+			//	else if (event.type == SDL_MOUSEBUTTONDOWN)
+			//	{
+			//		// ... handle mouse clicks ...
+			//	}
+			//
+			//	// ... handle other kinds of events ...
+			//}
+
 			std::cout << forward.x << ' ' << forward.y << ' ' << forward.z << '\n';
 
 		
