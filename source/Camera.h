@@ -24,9 +24,11 @@ namespace dae
 
 		Vector3 origin{};
 		float fovAngle{90.f};
+		const float cameraVelocity{ 5.f };
 
+
+		Vector3 worldUp{ Vector3::UnitY };
 		Vector3 forward{Vector3::UnitZ};
-		//Vector3 forward{0.266f, -0.453f, 0.860f };
 		Vector3 up{Vector3::UnitY};
 		Vector3 right{Vector3::UnitX};
 
@@ -38,19 +40,17 @@ namespace dae
 
 		Matrix CalculateCameraToWorld()
 		{
-			Vector3 worldUp		{ Vector3::UnitY };
-			Vector3 newRight	{ Vector3::Cross(worldUp, forward) };
-			newRight.Normalize();
-
-			Vector3 newUp		{ Vector3::Cross(forward, newRight) };
-			newUp.Normalize();
+			right	= Vector3::Cross(worldUp, forward) ;
+			right.Normalize();
+			up		= Vector3::Cross(forward, right) ;
+			up.Normalize();
 			
-			Vector4 newRightVector4{ newRight, 0 };
-			Vector4 newUpVector4{ newUp, 0 };
-			Vector4 newForwardVector4	{ forward, 0 };
-			Vector4 newPositionVector4	{ origin, 1 };
+			Vector4 rightVector4{ right, 0 },
+				upVector4{ up, 0 },
+				forwardVector4{ forward, 0 },
+				originVector4{ origin, 1 };
 
-			Matrix ONB{ newRightVector4, newUpVector4, newForwardVector4, newPositionVector4 };
+			Matrix ONB{ rightVector4, upVector4, forwardVector4, originVector4 };
 			return ONB;
 		}
 
@@ -60,8 +60,6 @@ namespace dae
 
 			//Keyboard Input
 			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
-
-			const float cameraVelocity{ 5.f };
 
 			if (pKeyboardState[SDL_SCANCODE_W])
 			{
@@ -74,6 +72,7 @@ namespace dae
 			if (pKeyboardState[SDL_SCANCODE_D])
 			{
 				origin += right * cameraVelocity * deltaTime;
+				
 			}
 			if (pKeyboardState[SDL_SCANCODE_A])
 			{
@@ -96,8 +95,6 @@ namespace dae
 				fovAngle -= 1.0f;
 			}
 
-
-
 			//Mouse Input
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
@@ -115,7 +112,7 @@ namespace dae
 				//}
 
 			}
-
+		
 			//SDL_Event event;
 			//while (SDL_PollEvent(&event))
 			//{
@@ -153,12 +150,6 @@ namespace dae
 			//
 			//	// ... handle other kinds of events ...
 			//}
-
-			std::cout << forward.x << ' ' << forward.y << ' ' << forward.z << '\n';
-
-		
-
-			//assert(false && "Not Implemented Yet");
 		}
 	};
 }

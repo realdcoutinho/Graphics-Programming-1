@@ -140,9 +140,12 @@ namespace dae
 		//Direction from target to light
 		inline Vector3 GetDirectionToLight(const Light& light, const Vector3 origin)
 		{
-			//todo W3
-			assert(false && "No Implemented Yet!");
-			return {};
+			////float x{ light.direction.x - origin.x };
+			////float y{ light.direction.y - origin.y };
+			////float z{ light.direction.z - origin.z };
+			//// 
+			////Vector3 directionVector{ x, y, z };
+			////return directionVector;
 		}
 
 		inline ColorRGB GetRadiance(const Light& light, const Vector3& target)

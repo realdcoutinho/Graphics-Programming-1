@@ -53,21 +53,27 @@ namespace dae {
 				closestHit = hitInfo;
 			}
 		}
-
-		
-
-
-		//assert(false && "No Implemented Yet!");
 	}
 
-	bool Scene::DoesHit(const Ray& ray) const
+	bool dae::Scene::DoesHit(const Ray& ray) const
 	{
-		//todo W3
-		assert(false && "No Implemented Yet!");
+		const int sizeVectorSphere{ static_cast<int>(m_SphereGeometries.size()) };
+		for (int i{}; i < sizeVectorSphere; ++i)
+		{
+			if (GeometryUtils::HitTest_Sphere(m_SphereGeometries[i], ray)) 
+				return true;
+		}
+
+		const int sizeVectorPlane{static_cast<int>(m_PlaneGeometries.size())};
+		for (int i{}; i < sizeVectorPlane; ++i)
+		{
+			if (GeometryUtils::HitTest_Plane(m_PlaneGeometries[i], ray)) 
+				return true;
+		}
 		return false;
 	}
 
-#pragma region Scene Helpers
+	#pragma region Scene Helpers
 	Sphere* Scene::AddSphere(const Vector3& origin, float radius, unsigned char materialIndex)
 	{
 		Sphere s;

@@ -223,6 +223,8 @@ void Renderer::Render(Scene* pScene) const
 
 			//creating a look vector for the camera
 			Vector3 rayDirection{ cameraX, cameraY, 1.0f};
+			const Vector3 lightRay{ cameraX, cameraY + 100.f, 1.0f };
+
 
 			//creating a camera matrix
 			const Matrix cameraToWorld{ camera.CalculateCameraToWorld() };
@@ -235,8 +237,7 @@ void Renderer::Render(Scene* pScene) const
 			ColorRGB finalColor{};
 			HitRecord closesHit{};
 			pScene->GetClosestHit(viewRay, closesHit);
-
-
+	
 			if (closesHit.didHit)
 			{
 				finalColor = materials[closesHit.materialIndex]->Shade(closesHit, rayDirection, camera.forward);
@@ -246,7 +247,6 @@ void Renderer::Render(Scene* pScene) const
 				static_cast<uint8_t>(finalColor.r * 255),
 				static_cast<uint8_t>(finalColor.g * 255),
 				static_cast<uint8_t>(finalColor.b * 255));
-
 		}
 	}
 
