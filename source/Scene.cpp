@@ -55,7 +55,7 @@ namespace dae {
 		}
 	}
 
-	bool dae::Scene::DoesHit(const Ray& ray) const
+	bool Scene::DoesHit(const Ray& ray) const
 	{
 		const int sizeVectorSphere{ static_cast<int>(m_SphereGeometries.size()) };
 		for (int i{}; i < sizeVectorSphere; ++i)

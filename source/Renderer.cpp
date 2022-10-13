@@ -207,24 +207,31 @@ void Renderer::Render(Scene* pScene) const
 	Camera& camera = pScene->GetCamera();
 	auto& materials = pScene->GetMaterials();
 	auto& lights = pScene->GetLights();
+	
 
+
+	//asPect ration calculation and variablesa
+	float aspectRatio{ static_cast<float>(m_Width) / static_cast<float>(m_Height) };
+	float FOV{ tanf(camera.fovAngle * TO_RADIANS / 2) };
+	float offset{ 0.001f };
+
+	int lightSize{ static_cast<int>(lights.size()) };
 
 	for (int px{}; px < m_Width; ++px)
 	{
 		for (int py{}; py < m_Height; ++py)
 		{
-			//asPect ration calculation and variablesa
-			float aspectRatio{ static_cast<float>(m_Width) / static_cast<float>(m_Height) };
-			float FOV{ tanf(camera.fovAngle * TO_RADIANS / 2) };
 			//calculating camera posX and posY based on the given formula
 			float cameraX{ (2 * ((px + 0.5f) / static_cast<float>(m_Width)) - 1) * aspectRatio * FOV };
 			float cameraY{ (1 - 2 * ((py + 0.5f) / static_cast<float>(m_Height))) * FOV };
 
-
 			//creating a look vector for the camera
 			Vector3 rayDirection{ cameraX, cameraY, 1.0f};
-			const Vector3 lightRay{ cameraX, cameraY + 100.f, 1.0f };
 
+
+			Vector3 lightOrigin{ cameraX, cameraY + offset, 1.0f };
+			Vector3 lightDirection{ cameraX, - cameraY + offset, 1.0f };
+			const Ray lightRay{ lightOrigin,  lightDirection };
 
 			//creating a camera matrix
 			const Matrix cameraToWorld{ camera.CalculateCameraToWorld() };
@@ -235,12 +242,21 @@ void Renderer::Render(Scene* pScene) const
 
 
 			ColorRGB finalColor{};
-			HitRecord closesHit{};
-			pScene->GetClosestHit(viewRay, closesHit);
+			HitRecord closestHit{};
+			pScene->GetClosestHit(viewRay, closestHit);
 	
-			if (closesHit.didHit)
+			if (closestHit.didHit)
 			{
-				finalColor = materials[closesHit.materialIndex]->Shade(closesHit, rayDirection, camera.forward);
+				finalColor = materials[closestHit.materialIndex]->Shade(closestHit, rayDirection, camera.forward);
+				for (int i{}; i < lightSize; ++i)
+				{
+					Vector3 direction{ LightUtils::GetDirectionToLight(lights[i], closestHit.origin) };
+					Ray lightRay{ closestHit.origin + (closestHit.normal * offset), direction.Normalized(), offset, direction.Magnitude() };
+					if (pScene->DoesHit(lightRay))
+					{
+						finalColor *= 0.5f;
+					}
+				}
 			}
 
 			m_pBufferPixels[px + (py * m_Width)] = SDL_MapRGB(m_pBuffer->format,

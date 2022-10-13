@@ -44,7 +44,7 @@ namespace dae
 			{
 				//ray touches intersects the sphere in two points
 				float t{ (-B - sqrt(discriminant)) / 2 * A };
-				Vector3 p{ ray.origin + t*ray.direction};
+				Vector3 p{ ray.origin + t * ray.direction};
 				
 				Vector3 vectorSphereCenterToP{ p.x - sphere.origin.x, p.y - sphere.origin.y, p.z - sphere.origin.z };
 				//Vector3 vectorSphereCenterToP{ p.x - sphere.origin.x, p.y - sphere.origin.y, p.z - sphere.origin.z };
@@ -52,8 +52,8 @@ namespace dae
 				hitRecord.didHit = true;
 				hitRecord.materialIndex = sphere.materialIndex;
 				hitRecord.normal = vectorSphereCenterToP.Normalized();
-				hitRecord.origin = p;
 				hitRecord.t = t;
+				hitRecord.origin = (p - sphere.origin).Normalized();
 				return hitRecord.didHit;
 			}
 			return false;
@@ -88,9 +88,10 @@ namespace dae
 				{
 					hitRecord.didHit = true;
 					hitRecord.materialIndex = plane.materialIndex;
-					hitRecord.normal = plane.normal;
-					hitRecord.origin = ray.origin;
+
 					hitRecord.t = t;
+					hitRecord.origin = p;
+					hitRecord.normal = plane.normal;
 					return hitRecord.didHit;
 				}
 				return false;
@@ -140,12 +141,14 @@ namespace dae
 		//Direction from target to light
 		inline Vector3 GetDirectionToLight(const Light& light, const Vector3 origin)
 		{
-			////float x{ light.direction.x - origin.x };
-			////float y{ light.direction.y - origin.y };
-			////float z{ light.direction.z - origin.z };
-			//// 
-			////Vector3 directionVector{ x, y, z };
-			////return directionVector;
+			if (light.type == LightType::Directional)
+			{
+				return -light.direction;
+			}
+			 
+			Vector3 lightDirection{ light.origin - origin };
+
+			return lightDirection;
 		}
 
 		inline ColorRGB GetRadiance(const Light& light, const Vector3& target)
