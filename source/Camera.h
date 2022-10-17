@@ -8,6 +8,9 @@
 #include "Math.h"
 #include "Timer.h"
 #include <iostream>
+#include "Renderer.h"
+
+
 
 namespace dae
 {
@@ -112,6 +115,9 @@ namespace dae
 				//}
 
 			}
+
+
+
 		
 			//SDL_Event event;
 			//while (SDL_PollEvent(&event))

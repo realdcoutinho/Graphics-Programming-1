@@ -213,7 +213,7 @@ void Renderer::Render(Scene* pScene) const
 	//asPect ration calculation and variablesa
 	float aspectRatio{ static_cast<float>(m_Width) / static_cast<float>(m_Height) };
 	float FOV{ tanf(camera.fovAngle * TO_RADIANS / 2) };
-	float offset{ 0.001f };
+	float offset{ 0.0001f };
 
 	int lightSize{ static_cast<int>(lights.size()) };
 
@@ -228,14 +228,9 @@ void Renderer::Render(Scene* pScene) const
 			//creating a look vector for the camera
 			Vector3 rayDirection{ cameraX, cameraY, 1.0f};
 
-
-			Vector3 lightOrigin{ cameraX, cameraY + offset, 1.0f };
-			Vector3 lightDirection{ cameraX, - cameraY + offset, 1.0f };
-			const Ray lightRay{ lightOrigin,  lightDirection };
-
 			//creating a camera matrix
 			const Matrix cameraToWorld{ camera.CalculateCameraToWorld() };
-			rayDirection = cameraToWorld.TransformVector(rayDirection);
+			rayDirection = cameraToWorld.TransformVector(Vector3{cameraX, cameraY, 1}.Normalized());
 			rayDirection.Normalize();
 
 			Ray viewRay(camera.origin, rayDirection);
@@ -247,22 +242,55 @@ void Renderer::Render(Scene* pScene) const
 	
 			if (closestHit.didHit)
 			{
-				finalColor = materials[closestHit.materialIndex]->Shade(closestHit, rayDirection, camera.forward);
+				//finalColor = materials[closestHit.materialIndex]->Shade(closestHit, rayDirection, camera.forward);
 				for (int i{}; i < lightSize; ++i)
 				{
 					Vector3 direction{ LightUtils::GetDirectionToLight(lights[i], closestHit.origin) };
-					Ray lightRay{ closestHit.origin + (closestHit.normal * offset), direction.Normalized(), offset, direction.Magnitude() };
-					if (pScene->DoesHit(lightRay))
-					{
-						finalColor *= 0.5f;
-					}
-				}
-			}
+					Ray lightRay{ closestHit.origin + (closestHit.normal * offset), direction.Normalized(), 0.0, direction.Magnitude() };
 
+					ColorRGB eRGB{ LightUtils::GetRadiance(lights[i], closestHit.origin) };
+					const ColorRGB BRDF{ materials[closestHit.materialIndex]->Shade(closestHit, direction.Normalized(), -rayDirection) };
+
+
+					float lambertCosine{};
+					if (LightType::Point == lights[i].type)
+						lambertCosine = Vector3::Dot(closestHit.normal, direction.Normalized());
+					if (LightType::Directional == lights[i].type)
+						float lambertCosine{ Vector3::Dot(closestHit.normal, lights[i].direction) };
+					if ((lambertCosine < 0))
+						continue;  // Skip if observedarea is negative
+
+					switch (m_CurrentLightingMode)
+					{
+					case dae::Renderer::LightingMode::ObservedArea:
+						finalColor += ColorRGB{ lambertCosine, lambertCosine, lambertCosine };
+						break;
+					case dae::Renderer::LightingMode::Radiance:
+						finalColor += eRGB;
+						break;
+					case dae::Renderer::LightingMode::BRDF:
+						finalColor += BRDF;
+						break;
+					case dae::Renderer::LightingMode::Combined:
+						finalColor += eRGB * lambertCosine * BRDF;
+						break;
+					}
+
+					if (m_ShadowsEnabled)
+					{
+						if (pScene->DoesHit(lightRay))
+							finalColor *= 0.5f;
+					}
+
+				}
+
+			}
+			finalColor.MaxToOne();
 			m_pBufferPixels[px + (py * m_Width)] = SDL_MapRGB(m_pBuffer->format,
 				static_cast<uint8_t>(finalColor.r * 255),
 				static_cast<uint8_t>(finalColor.g * 255),
 				static_cast<uint8_t>(finalColor.b * 255));
+
 		}
 	}
 
@@ -274,4 +302,27 @@ void Renderer::Render(Scene* pScene) const
 bool Renderer::SaveBufferToImage() const
 {
 	return SDL_SaveBMP(m_pBuffer, "RayTracing_Buffer.bmp");
+}
+
+void Renderer::CycleLightingMode()
+{
+	switch (m_CurrentLightingMode)
+	{
+	case LightingMode::ObservedArea:
+		std::cout << "CYCLE MODE: Radience" << "\n";
+		m_CurrentLightingMode = LightingMode::Radiance;
+		break;
+	case LightingMode::Radiance:
+		std::cout << "CYCLE MODE: BRDF" << "\n";
+		m_CurrentLightingMode = LightingMode::BRDF;
+		break;
+	case LightingMode::BRDF:
+		std::cout << "CYCLE MODE: Combined" << "\n";
+		m_CurrentLightingMode = LightingMode::Combined;
+		break;
+	case LightingMode::Combined:
+		std::cout << "CYCLE MODE: Observed" << "\n";
+		m_CurrentLightingMode = LightingMode::ObservedArea;
+		break;
+	}
 }

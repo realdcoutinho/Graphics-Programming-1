@@ -59,9 +59,7 @@ namespace dae
 
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			return BRDF::Lambert(m_DiffuseReflectance, m_DiffuseColor);
 		}
 
 	private:
@@ -84,9 +82,8 @@ namespace dae
 
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
 		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
+			return BRDF::Lambert(m_DiffuseReflectance, m_DiffuseColor)
+				+ BRDF::Phong(m_SpecularReflectance, m_PhongExponent, l, -v, hitRecord.normal);
 		}
 
 	private:
@@ -108,11 +105,41 @@ namespace dae
 		}
 
 		ColorRGB Shade(const HitRecord& hitRecord = {}, const Vector3& l = {}, const Vector3& v = {}) override
-		{
-			//todo: W3
-			assert(false && "Not Implemented Yet");
-			return {};
-		}
+			{
+			const ColorRGB f0{ m_Metalness == 0 ? ColorRGB(0.04f, 0.04f, 0.04f) : m_Albedo };  // f0 (used for fresnel)
+			
+			Vector3 vPlusL{ v + l };
+			Vector3 halfVector{ vPlusL / vPlusL.Magnitude() };
+			
+			ColorRGB fresnelFunction{ BRDF::FresnelFunction_Schlick(halfVector, v.Normalized(), f0) };
+			float normalDistributionFunction{ BRDF::NormalDistribution_GGX(hitRecord.normal, halfVector, m_Roughness) };
+			const float gSmith = BRDF::GeometryFunction_Smith(hitRecord.normal, v, l, m_Roughness);
+
+			float vDotN{ Vector3::Dot(v, hitRecord.normal) };
+			float lDotN{ Vector3::Dot(l, hitRecord.normal) };
+			float denominator{ 4 * vDotN * lDotN };
+			
+			ColorRGB nominator{ (normalDistributionFunction * fresnelFunction * gSmith) };
+			ColorRGB cookTorrance{ nominator / denominator };
+			
+			//ColorRGB kd{};
+			//if (m_Metalness > 0.0f)
+			//{
+			//	kd = ColorRGB(1, 1, 1) - f0;
+			//}
+			//else {
+			//	
+
+			//}
+
+			const float kd{ m_Metalness == 0.f ? 1.f - f0.r : 0.f };
+
+			ColorRGB lamberDiffuse{ BRDF::Lambert(kd, m_Albedo) };
+
+
+			
+			return cookTorrance + lamberDiffuse;
+			}
 
 	private:
 		ColorRGB m_Albedo{0.955f, 0.637f, 0.538f}; //Copper

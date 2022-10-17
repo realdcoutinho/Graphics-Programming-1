@@ -12,27 +12,22 @@ namespace dae
 		//SPHERE HIT-TESTS
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			//todo W1
-
-			Vector3 center{ sphere.origin };
-			float cX{ center.x };
-			float cY{ center.y };
-			float cZ{ center.z };
-
 			//Quadratic equation A B and C
 			float A{ Vector3::Dot(ray.direction, ray.direction) };
 			float B{ Vector3::Dot(2*ray.direction, ray.origin - sphere.origin)};
 			float C{ Vector3::Dot(ray.origin - sphere.origin,  ray.origin - sphere.origin) - powf(sphere.radius, 2)};
 
-			float discriminant{ powf(B, 2) - 4 * A * C};
+			float tMax{ ray.max };
+			float tMin{ ray.min };
+			float discriminant{ powf(B, 2) - (4 * A * C)};
 
-			float tMax{ray.max};
-			float tMin{ray.min};
+
 
 
 			if (discriminant < 0)
 			{
 				//ray does not intersect
+				hitRecord.didHit = false;
 				return false;
 			}
 			if(discriminant == 0)
@@ -40,21 +35,28 @@ namespace dae
 				//ray touches the sphere in one point
 				return false;
 			}
-			if (discriminant > 0)
+			if (discriminant >= 0)
 			{
-				//ray touches intersects the sphere in two points
 				float t{ (-B - sqrt(discriminant)) / 2 * A };
-				Vector3 p{ ray.origin + t * ray.direction};
-				
-				Vector3 vectorSphereCenterToP{ p.x - sphere.origin.x, p.y - sphere.origin.y, p.z - sphere.origin.z };
-				//Vector3 vectorSphereCenterToP{ p.x - sphere.origin.x, p.y - sphere.origin.y, p.z - sphere.origin.z };
-				
-				hitRecord.didHit = true;
-				hitRecord.materialIndex = sphere.materialIndex;
-				hitRecord.normal = vectorSphereCenterToP.Normalized();
-				hitRecord.t = t;
-				hitRecord.origin = (p - sphere.origin).Normalized();
-				return hitRecord.didHit;
+				if (t >= tMin && t <= tMax)
+				{
+					//ray touches intersects the sphere in two points
+
+					Vector3 p{ ray.origin + t * ray.direction };
+
+					Vector3 vectorSphereCenterToP{ p.x - sphere.origin.x, p.y - sphere.origin.y, p.z - sphere.origin.z };
+
+					hitRecord.didHit = true;
+					hitRecord.t = t;
+					hitRecord.origin = p;
+					hitRecord.materialIndex = sphere.materialIndex;
+					hitRecord.normal = vectorSphereCenterToP.Normalized();
+
+
+					return hitRecord.didHit;
+				}
+
+
 			}
 			return false;
 			
@@ -153,9 +155,23 @@ namespace dae
 
 		inline ColorRGB GetRadiance(const Light& light, const Vector3& target)
 		{
-			//todo W3
-			assert(false && "No Implemented Yet!");
-			return {};
+
+			if (light.type == LightType::Point)
+			{
+				const float intensity{ light.intensity };
+				const Vector3 lightPosition{ light.origin };
+				const Vector3 pointToShade{ target };
+				const ColorRGB lightColor{ light.color };
+
+				return lightColor * (intensity / (lightPosition - pointToShade).SqrMagnitude());
+
+			}
+			if (light.type == LightType::Directional)
+			{
+				const float intensity{ light.intensity };
+				const ColorRGB lightColor{ light.color };
+				return lightColor * intensity;
+			}
 		}
 	}
 
