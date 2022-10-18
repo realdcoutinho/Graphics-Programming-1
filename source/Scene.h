@@ -5,6 +5,8 @@
 #include "Math.h"
 #include "DataTypes.h"
 #include "Camera.h"
+#include <vector>
+
 
 namespace dae
 {
@@ -125,6 +127,27 @@ namespace dae
 		Scene_W3& operator=(Scene_W3&&) noexcept = delete;
 
 		void Initialize() override;
+	};
+
+	//+++++++++++++++++++++++++++++++++++++++++
+//WEEK 4 testScene
+	class Scene_W4_TestScene final : public Scene
+	{
+	public:
+		Scene_W4_TestScene() = default;
+		~Scene_W4_TestScene() override = default;
+
+		Scene_W4_TestScene(const Scene_W4_TestScene&) = delete;
+		Scene_W4_TestScene(Scene_W4_TestScene&&) noexcept = delete;
+		Scene_W4_TestScene& operator=(const Scene_W4_TestScene&) = delete;
+		Scene_W4_TestScene& operator=(Scene_W4_TestScene&&) noexcept = delete;
+
+		void Initialize() override;
+
+		const std::vector<Triangle>& GetPlaneGeometries() const { return m_Triangles; }
+		const std::vector<Material*> GetMaterials() const { return m_Materials; }
+
+		std::vector<Triangle> m_Triangles{};
 	};
 }
 

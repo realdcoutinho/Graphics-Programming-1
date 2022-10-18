@@ -16,7 +16,15 @@ namespace dae
 
 		float Magnitude() const;
 		float SqrMagnitude() const;
-		float Normalize();
+		float Normalize()
+		{
+			const float m = Magnitude();
+			x /= m;
+			y /= m;
+			z /= m;
+
+			return m;
+		}
 		Vector3 Normalized() const;
 
 		static float Dot(const Vector3& v1, const Vector3& v2);

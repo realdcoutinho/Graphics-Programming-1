@@ -285,11 +285,40 @@ namespace dae {
 		//Light
 		AddPointLight({ 0.0f, 5.0f, 5.0f }, 25.0f, colors::White);
 		AddPointLight({ 0.0f, 2.5f, -5.0f }, 25.0f, colors::White);
+	}
+#pragma endregion
 
+#pragma region SCENE W4 TestScene
 
+	void Scene_W4_TestScene::Initialize()
+	{
+		m_Camera.origin = { 0.0f, 1.0f, -5.0f };
+		m_Camera.fovAngle = 45.0f;
 
+		//Materials
+		const auto matLambert_GrayBlue = AddMaterial(new Material_Lambert({0.49f, 0.57f, 0.57f}, 1.0f));
+		const auto matLamber_White = AddMaterial(new Material_Lambert(colors::White, 1.0f));
+	
+		//Planes
+	//Plane
+		AddPlane(Vector3{ 0.0f, 0.0f, 10.0f }, Vector3{ 0.0f, 0.0f, -1.0f }, matLambert_GrayBlue); //BACK
+		AddPlane(Vector3{ 0.0f, 0.0f, 0.0f }, Vector3{ 0.0f, 1.0f, 0.0f }, matLambert_GrayBlue);  //BOTTOM
+		AddPlane(Vector3{ 0.0f, 10.0f, 0.0f }, Vector3{ 0.0f, -1.0f, 0.0f }, matLambert_GrayBlue); //TOP
+		AddPlane(Vector3{ 5.0f, 0.0f, 10.0f }, Vector3{ -1.0f, 0.0f, 0.0f }, matLambert_GrayBlue); //RIGHT
+		AddPlane(Vector3{ -5.0f, 0.0f, 10.0f }, Vector3{ 1.0f, 0.0f, 0.0f }, matLambert_GrayBlue); //LEFT
 
+		//Triangle (Temp)
+		auto triangle = Triangle{ {0.75f, 0.5f, 0.0f}, {-0.75f, 2.0f, 0.0f}, {0.75f, 0.5f, 0.0f } };
 
+		triangle.cullMode = TriangleCullMode::NoCulling;
+		triangle.materialIndex = matLamber_White;
+
+		m_Triangles.emplace_back(triangle);
+
+		//Lights
+		AddPointLight({ 0.0f, 5.0f, 5.0f }, 50.0f, {1.0f, 0.61f, 0.45f});
+		AddPointLight({ -2.5f, 5.0f, -5.0f }, 70.0f, { 1.0f, 0.8f, 0.45f });
+		AddPointLight({ 2.5f, 5.0f, -5.0f }, 50.0f, { 0.34f, 0.47f, 0.68f });
 
 
 	}

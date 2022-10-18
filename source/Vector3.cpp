@@ -26,16 +26,6 @@ namespace dae {
 		return x * x + y * y + z * z;
 	}
 
-	float Vector3::Normalize()
-	{
-		const float m = Magnitude();
-		x /= m;
-		y /= m;
-		z /= m;
-
-		return m;
-	}
-
 	Vector3 Vector3::Normalized() const
 	{
 		const float m = Magnitude();

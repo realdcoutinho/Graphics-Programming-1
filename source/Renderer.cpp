@@ -245,20 +245,22 @@ void Renderer::Render(Scene* pScene) const
 				//finalColor = materials[closestHit.materialIndex]->Shade(closestHit, rayDirection, camera.forward);
 				for (int i{}; i < lightSize; ++i)
 				{
-					Vector3 direction{ LightUtils::GetDirectionToLight(lights[i], closestHit.origin) };
-					Ray lightRay{ closestHit.origin + (closestHit.normal * offset), direction.Normalized(), 0.0, direction.Magnitude() };
+					Vector3 lightDirection{ LightUtils::GetDirectionToLight(lights[i], closestHit.origin) };
+					Vector3 lightDirectionNormalized = lightDirection.Normalized();
+					Ray lightRay{ closestHit.origin + (closestHit.normal * offset), lightDirectionNormalized, 0.0, lightDirection.Magnitude() };
+
 
 					ColorRGB eRGB{ LightUtils::GetRadiance(lights[i], closestHit.origin) };
-					const ColorRGB BRDF{ materials[closestHit.materialIndex]->Shade(closestHit, direction.Normalized(), -rayDirection) };
+					const ColorRGB BRDF{ materials[closestHit.materialIndex]->Shade(closestHit, lightDirectionNormalized, -rayDirection) };
 
 
-					float lambertCosine{};
+					float lambertCosine{}; //aka ObservedArea
 					if (LightType::Point == lights[i].type)
-						lambertCosine = Vector3::Dot(closestHit.normal, direction.Normalized());
+						lambertCosine = Vector3::Dot(closestHit.normal, lightDirection.Normalized());
 					if (LightType::Directional == lights[i].type)
 						float lambertCosine{ Vector3::Dot(closestHit.normal, lights[i].direction) };
 					if ((lambertCosine < 0))
-						continue;  // Skip if observedarea is negative
+						continue;  // Skip if observedArea is negative
 
 					switch (m_CurrentLightingMode)
 					{

@@ -111,8 +111,8 @@ namespace dae
 		//TRIANGLE HIT-TESTS
 		inline bool HitTest_Triangle(const Triangle& triangle, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			//todo W5
-			assert(false && "No Implemented Yet!");
+			Vector3 a{ triangle.v0 - triangle.v1 };
+			Vector3 b{ triangle.v2 - triangle.v0 };
 			return false;
 		}
 
