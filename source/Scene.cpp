@@ -33,6 +33,7 @@ namespace dae {
 		//todo W1
 		const int sizeVectorSphere{ static_cast<int>(m_SphereGeometries.size()) };
 		const int sizeVectorPlanes{ static_cast<int>(m_PlaneGeometries.size()) };
+		const int sizeVectorTriangles{ static_cast<int>(m_Triangles.size()) };
 
 		for (int i{}; i < sizeVectorSphere; ++i)
 		{
@@ -53,6 +54,15 @@ namespace dae {
 				closestHit = hitInfo;
 			}
 		}
+		for (int i{}; i < sizeVectorTriangles; ++i)
+		{
+			HitRecord hitInfo{};
+			GeometryUtils::HitTest_Triangle(m_Triangles[i], ray, hitInfo);
+			if (hitInfo.t < closestHit.t) // ask about it
+			{
+				closestHit = hitInfo;
+			}
+		}
 	}
 
 	bool Scene::DoesHit(const Ray& ray) const
@@ -68,6 +78,12 @@ namespace dae {
 		for (int i{}; i < sizeVectorPlane; ++i)
 		{
 			if (GeometryUtils::HitTest_Plane(m_PlaneGeometries[i], ray)) 
+				return true;
+		}
+		const int sizeVectortTriangles{ static_cast<int>(m_Triangles.size()) };
+		for (int i{}; i < sizeVectortTriangles; ++i)
+		{
+			if (GeometryUtils::HitTest_Triangle(m_Triangles[i], ray))
 				return true;
 		}
 		return false;
@@ -272,7 +288,7 @@ namespace dae {
 
 		const auto matPhong_Blue = AddMaterial(new Material_LambertPhong(colors::Blue, 1.f, 1.f, 60.0f));
 
-		const auto matCookTorrence_Yellow = AddMaterial(new Material_CookTorrence({0.04, 0.04f, 0.04f}, 1.0f, 0.1f));
+		const auto matCookTorrence_Yellow = AddMaterial(new Material_CookTorrence({0.04f, 0.04f, 0.04f}, 1.0f, 0.1f));
 
 
 		//Spheres
@@ -293,6 +309,7 @@ namespace dae {
 	void Scene_W4_TestScene::Initialize()
 	{
 		m_Camera.origin = { 0.0f, 1.0f, -5.0f };
+
 		m_Camera.fovAngle = 45.0f;
 
 		//Materials
@@ -308,7 +325,7 @@ namespace dae {
 		AddPlane(Vector3{ -5.0f, 0.0f, 10.0f }, Vector3{ 1.0f, 0.0f, 0.0f }, matLambert_GrayBlue); //LEFT
 
 		//Triangle (Temp)
-		auto triangle = Triangle{ {0.75f, 0.5f, 0.0f}, {-0.75f, 2.0f, 0.0f}, {0.75f, 0.5f, 0.0f } };
+		auto triangle = Triangle{ {-0.75f, 0.5f, 0.0f}, {-0.75f, 2.0f, 0.0f}, {0.75f, 0.5f, 0.0f } };
 
 		triangle.cullMode = TriangleCullMode::NoCulling;
 		triangle.materialIndex = matLamber_White;

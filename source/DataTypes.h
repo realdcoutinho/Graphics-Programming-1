@@ -123,6 +123,23 @@ namespace dae
 
 		void CalculateNormals()
 		{
+			//const int size{ static_cast<int>(indices.size()) };
+			//std::vector<Vector3> myPositions;
+			//myPositions.reserve(3);
+			//for (int indicesPositions{ 0 }; indicesPositions < size; indicesPositions)
+			//{
+			//	myPositions.push_back(positions[indices[indicesPositions]]);
+			//}
+			//Vector3 edgeA{ myPositions[0] - myPositions[1]};
+			//Vector3 edgeB{ myPositions[1] - myPositions[2] };
+			//Vector3 edgeC{ myPositions[2] - myPositions[0] };
+
+			//Vector3 normal1{ (Vector3::Cross(edgeA, edgeB)).Normalized() };
+			//Vector3 normal2{ (Vector3::Cross(edgeB, edgeC)).Normalized() };
+			//Vector3 normal2{ (Vector3::Cross(edgeC, edgeA)).Normalized() };
+
+			
+
 			assert(false && "No Implemented Yet!");
 		}
 

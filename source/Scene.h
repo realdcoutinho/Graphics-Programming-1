@@ -53,6 +53,8 @@ namespace dae
 		std::vector<Light> m_Lights{};
 		std::vector<Material*> m_Materials{};
 
+		std::vector<Triangle> m_Triangles{};
+
 		Camera m_Camera{};
 
 		Sphere* AddSphere(const Vector3& origin, float radius, unsigned char materialIndex = 0);
@@ -144,10 +146,9 @@ namespace dae
 
 		void Initialize() override;
 
-		const std::vector<Triangle>& GetPlaneGeometries() const { return m_Triangles; }
-		const std::vector<Material*> GetMaterials() const { return m_Materials; }
+		//onst std::vector<Triangle>& GetPlaneGeometries() const { return m_TriangleMeshGeometries; }
+		//const std::vector<Material*> GetMaterials() const { return m_Materials; }
 
-		std::vector<Triangle> m_Triangles{};
 	};
 }
 
