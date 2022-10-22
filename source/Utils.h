@@ -195,14 +195,41 @@ namespace dae
 		}
 #pragma endregion
 #pragma region TriangeMesh HitTest
-		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
+		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false, bool closestHit = false)
 		{
+			int sizeIndices{ static_cast<int>(mesh.indices.size()) };
+
+			for(int index{}; index < sizeIndices; ++index)
+			{
+				Vector3 v0{ mesh.transformedPositions[mesh.indices[index]] };
+				Vector3 v1{ mesh.transformedPositions[mesh.indices[++index]] };
+				Vector3 v2{ mesh.transformedPositions[mesh.indices[++index]] };
+
+				Triangle tempTriangle(v0, v1, v2, mesh.transformedNormals[index / 3]);
+				tempTriangle.cullMode = mesh.cullMode;
+				tempTriangle.materialIndex = mesh.materialIndex;
 
 
+				HitRecord hitRecordTemTriangle{};
+				bool hitTriangle{ HitTest_Triangle(tempTriangle, ray, hitRecordTemTriangle, ignoreHitRecord) };
+
+				if (hitTriangle)
+				{
+					if (!closestHit)
+					{
+						hitRecord = hitRecordTemTriangle;
+						return true;
+					}
+					else
+					{
+						if (hitRecordTemTriangle.t < hitRecord.t && hitRecordTemTriangle.t > 0.0f)
+							hitRecord = hitRecordTemTriangle;
+					}
+
+				}
 
 
-
-			assert(false && "No Implemented Yet!");
+			}
 			return false;
 		}
 

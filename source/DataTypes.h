@@ -3,6 +3,7 @@
 
 #include "Math.h"
 #include "vector"
+#include <iostream>
 
 namespace dae
 {
@@ -96,6 +97,18 @@ namespace dae
 		{
 			rotationTransform = Matrix::CreateRotationY(yaw);
 		}
+		void RotateX(float pitch)
+		{
+			rotationTransform = Matrix::CreateRotationX(pitch);
+		}
+		void RotateZ(float rool)
+		{
+			rotationTransform = Matrix::CreateRotationZ(rool);
+		}
+		void Rotate(float pitch, float yaw, float roll)
+		{
+			rotationTransform = Matrix::CreateRotation(pitch, yaw, roll);
+		}
 
 		void Scale(const Vector3& scale)
 		{
@@ -123,37 +136,56 @@ namespace dae
 
 		void CalculateNormals()
 		{
-			//const int size{ static_cast<int>(indices.size()) };
-			//std::vector<Vector3> myPositions;
-			//myPositions.reserve(3);
-			//for (int indicesPositions{ 0 }; indicesPositions < size; indicesPositions)
-			//{
-			//	myPositions.push_back(positions[indices[indicesPositions]]);
-			//}
-			//Vector3 edgeA{ myPositions[0] - myPositions[1]};
-			//Vector3 edgeB{ myPositions[1] - myPositions[2] };
-			//Vector3 edgeC{ myPositions[2] - myPositions[0] };
+			const int sizeIndices{ static_cast<int>(indices.size()) };
 
-			//Vector3 normal1{ (Vector3::Cross(edgeA, edgeB)).Normalized() };
-			//Vector3 normal2{ (Vector3::Cross(edgeB, edgeC)).Normalized() };
-			//Vector3 normal2{ (Vector3::Cross(edgeC, edgeA)).Normalized() };
+			for (int index{}; index < sizeIndices; ++index)
+			{
+				
+				Vector3 v0{ positions[indices[index]] };
+				Vector3 v1{ positions[indices[++index]] };
+				Vector3 v2{ positions[indices[++index]] };
 
-			
+				Vector3 edgeA{ v1 - v0 };
+				Vector3 edgeB{ v2 - v1 };
+				//Vector3 edgeC{ v0 - v2 };
 
-			assert(false && "No Implemented Yet!");
+				Vector3 aCrossB{ Vector3::Cross(edgeA, edgeB) };
+				//Vector3 bCrossC{ Vector3::Cross(edgeB, edgeC) };
+				//Vector3 cCrossA{ Vector3::Cross(edgeC, edgeA) };
+
+				Vector3 normalOne{ aCrossB.Normalized() };
+				//Vector3 normalTwo{ bCrossC.Normalized() };
+				//Vector3 normalThree{ cCrossA.Normalized() };
+
+				normals.push_back(normalOne);
+			}
 		}
 
 		void UpdateTransforms()
 		{
-			assert(false && "No Implemented Yet!");
 			//Calculate Final Transform 
-			//const auto finalTransform = ...
+			const auto finalTransform = scaleTransform * rotationTransform * translationTransform;
 
 			//Transform Positions (positions > transformedPositions)
 			//...
+			transformedPositions.clear();
+			transformedPositions.reserve(positions.size());
+			for (Vector3& pos : positions)
+			{
+				Vector3 transPos{ finalTransform.TransformPoint(pos) };
+				transformedPositions.emplace_back(transPos);
+			}
 
 			//Transform Normals (normals > transformedNormals)
 			//...
+			transformedNormals.clear();
+			transformedNormals.reserve(normals.size());
+			for (Vector3& nom : normals)
+			{
+				Vector3 transNom{ finalTransform.TransformPoint(nom) };
+				transformedNormals.emplace_back(transNom);
+			}
+
 		}
 	};
 #pragma endregion

@@ -40,8 +40,8 @@ namespace dae
 	float Vector4::Dot(const Vector4& v1, const Vector4& v2)
 	{
 		//todo W1
-		assert(false && "Not Implemented Yet");
-		return {};
+		
+		return { Vector3::Dot(v1, v2) };
 	}
 
 #pragma region Operator Overloads
