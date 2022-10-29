@@ -105,7 +105,7 @@ namespace dae {
 	Matrix Matrix::CreateTranslation(float x, float y, float z)
 	{
 		Vector4 line1{ 1, 0, 0, x };
-		Vector4 line2{ 0, 1, -0, y };
+		Vector4 line2{ 0, 1, 0, y };
 		Vector4 line3{ 0, 0, 0, z };
 		Vector4 line4{ 0, 0, 0, 1 };
 		Matrix matrixTranslation{ line1, line2, line3, line4 };

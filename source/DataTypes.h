@@ -182,7 +182,7 @@ namespace dae
 			transformedNormals.reserve(normals.size());
 			for (Vector3& nom : normals)
 			{
-				Vector3 transNom{ finalTransform.TransformPoint(nom) };
+				Vector3 transNom{ finalTransform.TransformVector(nom) };
 				transformedNormals.emplace_back(transNom);
 			}
 

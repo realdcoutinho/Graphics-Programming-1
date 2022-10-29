@@ -41,7 +41,7 @@ namespace dae
 	{
 		//todo W1
 		
-		return { Vector3::Dot(v1, v2) };
+		return { v1.x * v2.x + v1.y * v2.y + v1.z * v2.z + v1.w * v2.w };
 	}
 
 #pragma region Operator Overloads

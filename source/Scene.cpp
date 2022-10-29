@@ -372,32 +372,32 @@ namespace dae {
 
 
 
-		//pMesh = AddTriangleMesh(TriangleCullMode::NoCulling, matLamber_White);
+		pMesh = AddTriangleMesh(TriangleCullMode::NoCulling, matLamber_White);
 
-		//pMesh->positions = {
-		//	{-0.75f, -1.0f, 0.0f},
-		//	{-0.75f, 1.0f, 0.0f},
-		//	{0.75f, 1.0f, 1.0f},
-		//	{0.75, -1.0f, 0.0f} };
-		//pMesh->indices = {
-		//	0, 1, 2, //Triangle1
-		//	0, 2, 3 //Triangle2
-		//};
+		pMesh->positions = {
+			{-0.75f, -1.0f, 0.0f},
+			{-0.75f, 1.0f, 0.0f},
+			{0.75f, 1.0f, 1.0f},
+			{0.75, -1.0f, 0.0f} };
+		pMesh->indices = {
+			0, 1, 2, //Triangle1
+			0, 2, 3 //Triangle2
+		};
 
-		//pMesh->CalculateNormals();
+		pMesh->CalculateNormals();
 
-		//pMesh->Translate({ 0.0f, 1.5f, 0.0f });
-
-		//pMesh->UpdateTransforms();
-
-
-		pMesh = AddTriangleMesh(TriangleCullMode::BackFaceCulling, matLamber_White);
-		Utils::ParseOBJ("Resources/simple_cube.obj", pMesh->positions, pMesh->normals, pMesh->indices);
-
-		pMesh->Scale({ 0.7f, 0.7f, 0.7f });
-		pMesh->Translate({ 0.0f, 1.0f, 0.0f });
+		pMesh->Translate({ 0.0f, 1.5f, 0.0f });
 
 		pMesh->UpdateTransforms();
+
+
+		//pMesh = AddTriangleMesh(TriangleCullMode::BackFaceCulling, matLamber_White);
+		//Utils::ParseOBJ("Resources/simple_cube.obj", pMesh->positions, pMesh->normals, pMesh->indices);
+
+		//pMesh->Scale({ 0.7f, 0.7f, 0.7f });
+		//pMesh->Translate({ 0.0f, 1.0f, 0.0f });
+
+		//pMesh->UpdateTransforms();
 
 
 

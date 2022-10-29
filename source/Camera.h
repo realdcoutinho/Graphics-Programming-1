@@ -54,6 +54,7 @@ namespace dae
 				originVector4{ origin, 1 };
 
 			Matrix ONB{ rightVector4, upVector4, forwardVector4, originVector4 };
+			cameraToWorld = ONB;
 			return ONB;
 		}
 

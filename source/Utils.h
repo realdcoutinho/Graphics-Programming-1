@@ -113,8 +113,8 @@ namespace dae
 		{
 			Vector3 a{ triangle.v1 - triangle.v0 };
 			Vector3 b{ triangle.v2 - triangle.v1 };
-			Vector3 triangleCross{ Vector3::Cross(a,b) };
-			Vector3 triangleNormal{ triangleCross.Normalized() };
+			//Vector3 triangleCross{ Vector3::Cross(a,b) };
+			Vector3 triangleNormal{ triangle.normal };
 		
 
 			float dot(Vector3::Dot(triangleNormal, ray.direction));
@@ -144,7 +144,7 @@ namespace dae
 			float tMax{ ray.max };
 			float tMin{ ray.min };
 
-			if (t < tMin && t > tMax)
+			if (t < tMin || t > tMax)
 				return false;
 
 			Vector3 hitPoint{ ray.origin + t * ray.direction };
