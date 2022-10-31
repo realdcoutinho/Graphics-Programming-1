@@ -508,12 +508,17 @@ namespace dae {
 
 
 		pMesh = AddTriangleMesh(TriangleCullMode::BackFaceCulling, matLamber_White);
-		Utils::ParseOBJ("Resources/lowpoly_bunny.obj", pMesh->positions, pMesh->normals, pMesh->indices);
+		Utils::ParseOBJ("Resources/lowpoly_bunny.obj", 
+			pMesh->positions, 
+			pMesh->normals, 
+			pMesh->indices);
 
-		//pMesh->Scale({ 2.0f, 2.0f, 2.0f });
-		pMesh->Translate({ 0.0f, 1.0f, 0.0f });
+		pMesh->Scale({ 2.0f, 2.0f, 2.0f });
+		pMesh->UpdateAABB();
 
-		pMesh->RotateY(180);
+
+
+		//pMesh->RotateY(180);
 
 		pMesh->UpdateTransforms();
 

@@ -35,7 +35,13 @@ namespace dae
 	{
 		Triangle() = default;
 		Triangle(const Vector3& _v0, const Vector3& _v1, const Vector3& _v2, const Vector3& _normal):
-			v0{_v0}, v1{_v1}, v2{_v2}, normal{_normal.Normalized()}{}
+			v0{_v0}, v1{_v1}, v2{_v2}, normal{_normal.Normalized()}
+		{
+			//positions.push_back(v0);
+			//positions.push_back(v1);
+			//positions.push_back(v2);
+			//UpdateAABB();
+		}
 
 		Triangle(const Vector3& _v0, const Vector3& _v1, const Vector3& _v2) :
 			v0{ _v0 }, v1{ _v1 }, v2{ _v2 }
@@ -53,6 +59,31 @@ namespace dae
 
 		TriangleCullMode cullMode{};
 		unsigned char materialIndex{};
+
+
+
+		Vector3 minAABB{};
+		Vector3 maxAABB{};
+
+		std::vector<Vector3> positions{};
+
+
+
+		//void UpdateAABB()
+		//{
+		//	if (positions.size() > 0)
+		//	{
+		//		minAABB = positions[0];
+		//		maxAABB = positions[0];
+		//		for (auto& pos : positions)
+		//		{
+		//			minAABB = Vector3::Min(pos, minAABB);
+		//			maxAABB = Vector3::Min(pos, maxAABB);
+		//		}
+		//	}
+		//}
+
+
 	};
 
 	struct TriangleMesh
@@ -84,9 +115,103 @@ namespace dae
 		Matrix rotationTransform{};
 		Matrix translationTransform{};
 		Matrix scaleTransform{};
+		Matrix finalTransform{};
 
 		std::vector<Vector3> transformedPositions{};
 		std::vector<Vector3> transformedNormals{};
+
+		//mine
+		Vector3 minAABB{};
+		Vector3 maxAABB{};
+
+		Vector3 transformedMinAABB{};
+		Vector3 transformedMaxAABB{};
+
+
+		void CalculateAABB()
+		{
+			minAABB = positions[0];
+			maxAABB = positions[0];
+			for (const Vector3& pos : positions)
+			{
+				//get min
+				if (pos.x < minAABB.x)
+					minAABB.x = pos.x;
+				if (pos.y < minAABB.y)
+					minAABB.y = pos.y;
+				if (pos.z < minAABB.z)
+					minAABB.z = pos.z;
+
+				//get max
+				if (pos.x > maxAABB.x)
+					maxAABB.x = pos.x;
+				if (pos.y > maxAABB.y)
+					maxAABB.y = pos.y;
+				if (pos.z > maxAABB.z)
+					maxAABB.z = pos.z;
+			}
+		}
+
+		void UpdateAABB()
+		{
+			if (positions.size() > 0)
+			{
+				minAABB = positions[0];
+				maxAABB = positions[0];
+				for (auto& pos : positions)
+				{
+					minAABB = Vector3::Min(pos, minAABB);
+					maxAABB = Vector3::Min(pos, maxAABB);
+				}
+			}
+		}
+
+		void UpdateTransformedAABB(const Matrix& finalTransform)
+		{
+			//AABB update: be careful-> transform the 8 vertices of the aabb
+			//and calculate new min and max
+			Vector3 tMinAABB = finalTransform.TransformPoint(minAABB);
+			Vector3 tMaxAABB = tMinAABB;
+
+			//(xmax, ymin, zmin)
+			Vector3 tAABB = finalTransform.TransformPoint(maxAABB.x, minAABB.y, minAABB.z);
+			tMinAABB = Vector3::Min(tAABB, tMinAABB);
+			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+
+			//(xmax, ymin, zmax)
+			tAABB = finalTransform.TransformPoint(maxAABB.x, minAABB.y, maxAABB.z);
+			tMinAABB = Vector3::Min(tAABB, tMinAABB);
+			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+
+			//(xmin, ymin, zmax)
+			tAABB = finalTransform.TransformPoint(minAABB.x, minAABB.y, maxAABB.z);
+			tMinAABB = Vector3::Min(tAABB, tMinAABB);
+			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+
+			//(xmin, ymax, zmin)
+			tAABB = finalTransform.TransformPoint(minAABB.x, maxAABB.y, minAABB.z);
+			tMinAABB = Vector3::Min(tAABB, tMinAABB);
+			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+
+			//(xmax, ymax, zmin)
+			tAABB = finalTransform.TransformPoint(maxAABB.x, maxAABB.y, minAABB.z);
+			tMinAABB = Vector3::Min(tAABB, tMinAABB);
+			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+
+			//(xmax, ymax, zmax)
+			tAABB = finalTransform.TransformPoint(maxAABB);
+			tMinAABB = Vector3::Min(tAABB, tMinAABB);
+			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+
+			//(xmin, ymax, zmax)
+			tAABB = finalTransform.TransformPoint(minAABB.x, maxAABB.y, minAABB.z);
+			tMinAABB = Vector3::Min(tAABB, tMinAABB);
+			tMaxAABB = Vector3::Max(tAABB, tMaxAABB);
+
+			transformedMinAABB = tMinAABB;
+			transformedMaxAABB = tMaxAABB;
+		}
+
 
 		void Translate(const Vector3& translation)
 		{
@@ -186,7 +311,16 @@ namespace dae
 				transformedNormals.emplace_back(transNom);
 			}
 
+			for (auto& p : positions)
+			{
+				transformedPositions.emplace_back(finalTransform.TransformPoint(p));
+			}
+
+			//Update AABB
+			UpdateTransformedAABB(finalTransform);
 		}
+
+
 	};
 #pragma endregion
 #pragma region LIGHT
