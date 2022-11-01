@@ -15,8 +15,8 @@
 
 using namespace dae;
 
-//#define ASYNC
-#define PARALLEL_FOR
+#define ASYNC
+//#define PARALLEL_FOR
 //none of the above means they will be working with synchronous logic (no threading)
 
 

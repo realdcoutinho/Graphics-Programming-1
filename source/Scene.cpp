@@ -31,79 +31,155 @@ namespace dae {
 	void dae::Scene::GetClosestHit(const Ray& ray, HitRecord& closestHit) const
 	{
 		//todo W1
-		const int sizeVectorSphere{ static_cast<int>(m_SphereGeometries.size()) };
-		const int sizeVectorPlanes{ static_cast<int>(m_PlaneGeometries.size()) };
-		const int sizeVectorTriangles{ static_cast<int>(m_Triangles.size()) };
-		const int sizeVectorMesh{ static_cast<int>(m_TriangleMeshGeometries.size()) };
+		//const int sizeVectorSphere{ static_cast<int>(m_SphereGeometries.size()) };
+		//const int sizeVectorPlanes{ static_cast<int>(m_PlaneGeometries.size()) };
+		//const int sizeVectorTriangles{ static_cast<int>(m_Triangles.size()) };
+		//const int sizeVectorMesh{ static_cast<int>(m_TriangleMeshGeometries.size()) };
 
-		for (int i{}; i < sizeVectorSphere; ++i)
+
+		for (auto& sphere : m_SphereGeometries)
 		{
 			HitRecord hitInfo{};
-			GeometryUtils::HitTest_Sphere(m_SphereGeometries[i], ray, hitInfo);
+			GeometryUtils::HitTest_Sphere(sphere, ray, hitInfo);
+			if (hitInfo.t < closestHit.t) // ask about it
+			{
+				closestHit = hitInfo;
+			}
+		}
+		//for (int i{}; i < sizeVectorSphere; ++i)
+		//{
+		//	HitRecord hitInfo{};
+		//	GeometryUtils::HitTest_Sphere(m_SphereGeometries[i], ray, hitInfo);
+		//	if (hitInfo.t < closestHit.t) // ask about it
+		//	{
+		//		closestHit = hitInfo;
+		//	}
+		//}
+
+		for (auto& plane : m_PlaneGeometries)
+		{
+			HitRecord hitInfo{};
+			GeometryUtils::HitTest_Plane(plane, ray, hitInfo);
 			if (hitInfo.t < closestHit.t) // ask about it
 			{
 				closestHit = hitInfo;
 			}
 		}
 
-		for (int i{}; i < sizeVectorPlanes; ++i)
+
+		//for (int i{}; i < sizeVectorPlanes; ++i)
+		//{
+		//	HitRecord hitInfo{};
+		//	GeometryUtils::HitTest_Plane(m_PlaneGeometries[i], ray, hitInfo);
+		//	if (hitInfo.t < closestHit.t) // ask about it
+		//	{
+		//		closestHit = hitInfo;
+		//	}
+		//}
+
+
+
+
+
+		for (auto& triangle : m_Triangles)
 		{
 			HitRecord hitInfo{};
-			GeometryUtils::HitTest_Plane(m_PlaneGeometries[i], ray, hitInfo);
+			GeometryUtils::HitTest_Triangle(triangle, ray, hitInfo);
 			if (hitInfo.t < closestHit.t) // ask about it
 			{
 				closestHit = hitInfo;
 			}
 		}
-		for (int i{}; i < sizeVectorTriangles; ++i)
+
+
+
+
+		//for (int i{}; i < sizeVectorTriangles; ++i)
+		//{
+		//	HitRecord hitInfo{};
+		//	GeometryUtils::HitTest_Triangle(m_Triangles[i], ray, hitInfo);
+		//	if (hitInfo.t < closestHit.t) // ask about it
+		//	{
+		//		closestHit = hitInfo;
+		//	}
+		//}
+
+
+		for (auto& triangleMeshes : m_TriangleMeshGeometries)
 		{
 			HitRecord hitInfo{};
-			GeometryUtils::HitTest_Triangle(m_Triangles[i], ray, hitInfo);
+			GeometryUtils::HitTest_TriangleMesh(triangleMeshes, ray, hitInfo, false, closestHit.didHit);
 			if (hitInfo.t < closestHit.t) // ask about it
 			{
 				closestHit = hitInfo;
 			}
 		}
-		for (int i{}; i < sizeVectorMesh; ++i)
-		{
-			HitRecord hitInfo{};
-			GeometryUtils::HitTest_TriangleMesh(m_TriangleMeshGeometries[i], ray, hitInfo, false, closestHit.didHit);
-			if (hitInfo.t < closestHit.t) // ask about it
-			{
-				closestHit = hitInfo;
-			}
 
-
-
-
-		}
+		//for (int i{}; i < sizeVectorMesh; ++i)
+		//{
+		//	HitRecord hitInfo{};
+		//	GeometryUtils::HitTest_TriangleMesh(m_TriangleMeshGeometries[i], ray, hitInfo, false, closestHit.didHit);
+		//	if (hitInfo.t < closestHit.t) // ask about it
+		//	{
+		//		closestHit = hitInfo;
+		//	}
+		//}
 	}
 
 	bool Scene::DoesHit(const Ray& ray) const
 	{
-		const int sizeVectorSphere{ static_cast<int>(m_SphereGeometries.size()) };
-		for (int i{}; i < sizeVectorSphere; ++i)
+		//const int sizeVectorSphere{ static_cast<int>(m_SphereGeometries.size()) };
+		//for (int i{}; i < sizeVectorSphere; ++i)
+		//{
+		//	if (GeometryUtils::HitTest_Sphere(m_SphereGeometries[i], ray)) 
+		//		return true;
+		//}
+
+		for (auto& sphere : m_SphereGeometries)
 		{
-			if (GeometryUtils::HitTest_Sphere(m_SphereGeometries[i], ray)) 
+			if (GeometryUtils::HitTest_Sphere(sphere, ray))
 				return true;
 		}
 
-		const int sizeVectorPlane{static_cast<int>(m_PlaneGeometries.size())};
-		for (int i{}; i < sizeVectorPlane; ++i)
+
+		//const int sizeVectorPlane{static_cast<int>(m_PlaneGeometries.size())};
+		//for (int i{}; i < sizeVectorPlane; ++i)
+		//{
+		//	if (GeometryUtils::HitTest_Plane(m_PlaneGeometries[i], ray)) 
+		//		return true;
+		//}
+
+		for (auto& plane : m_PlaneGeometries)
 		{
-			if (GeometryUtils::HitTest_Plane(m_PlaneGeometries[i], ray)) 
+			if (GeometryUtils::HitTest_Plane(plane, ray))
 				return true;
 		}
-		const int sizeVectortTriangles{ static_cast<int>(m_Triangles.size()) };
-		for (int i{}; i < sizeVectortTriangles; ++i)
+
+
+		//const int sizeVectortTriangles{ static_cast<int>(m_Triangles.size()) };
+		//for (int i{}; i < sizeVectortTriangles; ++i)
+		//{
+		//	if (GeometryUtils::HitTest_Triangle(m_Triangles[i], ray))
+		//		return true;
+		//}
+
+		for (auto& triangle : m_Triangles)
 		{
-			if (GeometryUtils::HitTest_Triangle(m_Triangles[i], ray))
+			if (GeometryUtils::HitTest_Triangle(triangle, ray))
 				return true;
 		}
-		const int sizeVectorMesh{ static_cast<int>(m_TriangleMeshGeometries.size()) };
-		for (int i{}; i < sizeVectorMesh; ++i)
+
+
+		//const int sizeVectorMesh{ static_cast<int>(m_TriangleMeshGeometries.size()) };
+		//for (int i{}; i < sizeVectorMesh; ++i)
+		//{
+		//	if (GeometryUtils::HitTest_TriangleMesh(m_TriangleMeshGeometries[i], ray))
+		//		return true;
+		//}
+
+		for (auto& triangleMeshes : m_TriangleMeshGeometries)
 		{
-			if (GeometryUtils::HitTest_TriangleMesh(m_TriangleMeshGeometries[i], ray))
+			if (GeometryUtils::HitTest_TriangleMesh(triangleMeshes, ray))
 				return true;
 		}
 		return false;
@@ -469,11 +545,9 @@ namespace dae {
 		m_Meshes[2]->Translate({ 1.75f, 4.5f, 0.0f });
 		m_Meshes[2]->UpdateTransforms();
 
-		AddPointLight({ 0.0f, 5.0f, 5.0f }, 50.0f, { 1.0f, 0.61f, 0.45f });
-		AddPointLight({ -2.5f, 5.0f, -5.0f }, 70.0f, { 1.0f, 0.8f, 0.45f });
-		AddPointLight({ 2.5f, 5.0f, -5.0f }, 50.0f, { 0.34f, 0.47f, 0.68f });
-
-
+		AddPointLight({ 0.f,  5.f,  5.f }, 50.f, ColorRGB{ 1.f, 0.61f, 0.45f });
+		AddPointLight({ -2.5f,  5.f, -5.f }, 70.f, ColorRGB{ 1.f,  0.8f, 0.45f });
+		AddPointLight({ 2.5f, 2.5f, -5.f }, 50.f, ColorRGB{ 0.34f, 0.47f, 0.68f });
 	}
 
 	void Scene_W4_ReferenceScene::Update(Timer* pTimer)
@@ -518,7 +592,7 @@ namespace dae {
 
 
 
-		//pMesh->RotateY(180);
+		pMesh->RotateY(M_PI);
 
 		pMesh->UpdateTransforms();
 
