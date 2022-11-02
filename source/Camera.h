@@ -24,10 +24,12 @@ namespace dae
 		{
 		}
 
-
 		Vector3 origin{};
-		float fovAngle{90.f};
+		float fovAngle{45.f};
 		const float cameraVelocity{ 5.f };
+
+		//mine
+		float m_FOV{ tanf(fovAngle * TO_RADIANS / 2) };
 
 
 		Vector3 worldUp{ Vector3::UnitY };
@@ -40,6 +42,10 @@ namespace dae
 
 		Matrix cameraToWorld{};
 
+		void UpdateCameraFOV()
+		{
+			m_FOV = tanf(fovAngle * TO_RADIANS / 2);
+		}
 
 		Matrix CalculateCameraToWorld()
 		{
@@ -66,38 +72,23 @@ namespace dae
 			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
 
 			if (pKeyboardState[SDL_SCANCODE_W])
-			{
 				origin += forward * cameraVelocity * deltaTime;
-			}
 			if (pKeyboardState[SDL_SCANCODE_S])
-			{
 				origin -= forward *cameraVelocity * deltaTime;
-			}
 			if (pKeyboardState[SDL_SCANCODE_D])
-			{
 				origin += right * cameraVelocity * deltaTime;
-				
-			}
 			if (pKeyboardState[SDL_SCANCODE_A])
-			{
 				origin -= right * cameraVelocity * deltaTime;
-			}
 			if (pKeyboardState[SDL_SCANCODE_E])
-			{
 				origin += up * cameraVelocity * deltaTime;
-			}
 			if (pKeyboardState[SDL_SCANCODE_Q])
-			{
 				origin -= up *  cameraVelocity * deltaTime;
-			}
 			if (pKeyboardState[SDL_SCANCODE_UP])
-			{
 				fovAngle +=1.0f;
-			}
+				UpdateCameraFOV();
 			if (pKeyboardState[SDL_SCANCODE_DOWN])
-			{
 				fovAngle -= 1.0f;
-			}
+				UpdateCameraFOV();
 
 			//Mouse Input
 			int mouseX{}, mouseY{};

@@ -4,6 +4,8 @@
 #include <iostream>
 
 
+
+
 namespace dae {
 
 #pragma region Base Scene
@@ -30,13 +32,6 @@ namespace dae {
 
 	void dae::Scene::GetClosestHit(const Ray& ray, HitRecord& closestHit) const
 	{
-		//todo W1
-		//const int sizeVectorSphere{ static_cast<int>(m_SphereGeometries.size()) };
-		//const int sizeVectorPlanes{ static_cast<int>(m_PlaneGeometries.size()) };
-		//const int sizeVectorTriangles{ static_cast<int>(m_Triangles.size()) };
-		//const int sizeVectorMesh{ static_cast<int>(m_TriangleMeshGeometries.size()) };
-
-
 		for (auto& sphere : m_SphereGeometries)
 		{
 			HitRecord hitInfo{};
@@ -46,15 +41,6 @@ namespace dae {
 				closestHit = hitInfo;
 			}
 		}
-		//for (int i{}; i < sizeVectorSphere; ++i)
-		//{
-		//	HitRecord hitInfo{};
-		//	GeometryUtils::HitTest_Sphere(m_SphereGeometries[i], ray, hitInfo);
-		//	if (hitInfo.t < closestHit.t) // ask about it
-		//	{
-		//		closestHit = hitInfo;
-		//	}
-		//}
 
 		for (auto& plane : m_PlaneGeometries)
 		{
@@ -66,44 +52,15 @@ namespace dae {
 			}
 		}
 
-
-		//for (int i{}; i < sizeVectorPlanes; ++i)
+		//for (auto& triangle : m_Triangles)
 		//{
 		//	HitRecord hitInfo{};
-		//	GeometryUtils::HitTest_Plane(m_PlaneGeometries[i], ray, hitInfo);
+		//	GeometryUtils::HitTest_Triangle(triangle, ray, hitInfo);
 		//	if (hitInfo.t < closestHit.t) // ask about it
 		//	{
 		//		closestHit = hitInfo;
 		//	}
 		//}
-
-
-
-
-
-		for (auto& triangle : m_Triangles)
-		{
-			HitRecord hitInfo{};
-			GeometryUtils::HitTest_Triangle(triangle, ray, hitInfo);
-			if (hitInfo.t < closestHit.t) // ask about it
-			{
-				closestHit = hitInfo;
-			}
-		}
-
-
-
-
-		//for (int i{}; i < sizeVectorTriangles; ++i)
-		//{
-		//	HitRecord hitInfo{};
-		//	GeometryUtils::HitTest_Triangle(m_Triangles[i], ray, hitInfo);
-		//	if (hitInfo.t < closestHit.t) // ask about it
-		//	{
-		//		closestHit = hitInfo;
-		//	}
-		//}
-
 
 		for (auto& triangleMeshes : m_TriangleMeshGeometries)
 		{
@@ -114,26 +71,10 @@ namespace dae {
 				closestHit = hitInfo;
 			}
 		}
-
-		//for (int i{}; i < sizeVectorMesh; ++i)
-		//{
-		//	HitRecord hitInfo{};
-		//	GeometryUtils::HitTest_TriangleMesh(m_TriangleMeshGeometries[i], ray, hitInfo, false, closestHit.didHit);
-		//	if (hitInfo.t < closestHit.t) // ask about it
-		//	{
-		//		closestHit = hitInfo;
-		//	}
-		//}
 	}
 
 	bool Scene::DoesHit(const Ray& ray) const
 	{
-		//const int sizeVectorSphere{ static_cast<int>(m_SphereGeometries.size()) };
-		//for (int i{}; i < sizeVectorSphere; ++i)
-		//{
-		//	if (GeometryUtils::HitTest_Sphere(m_SphereGeometries[i], ray)) 
-		//		return true;
-		//}
 
 		for (auto& sphere : m_SphereGeometries)
 		{
@@ -141,39 +82,16 @@ namespace dae {
 				return true;
 		}
 
-
-		//const int sizeVectorPlane{static_cast<int>(m_PlaneGeometries.size())};
-		//for (int i{}; i < sizeVectorPlane; ++i)
+		//comented out because planes are not casting shadows, I believe
+		//for (auto& plane : m_PlaneGeometries)
 		//{
-		//	if (GeometryUtils::HitTest_Plane(m_PlaneGeometries[i], ray)) 
+		//	if (GeometryUtils::HitTest_Plane(plane, ray))
 		//		return true;
 		//}
 
-		for (auto& plane : m_PlaneGeometries)
-		{
-			if (GeometryUtils::HitTest_Plane(plane, ray))
-				return true;
-		}
-
-
-		//const int sizeVectortTriangles{ static_cast<int>(m_Triangles.size()) };
-		//for (int i{}; i < sizeVectortTriangles; ++i)
+		//for (auto& triangle : m_Triangles)
 		//{
-		//	if (GeometryUtils::HitTest_Triangle(m_Triangles[i], ray))
-		//		return true;
-		//}
-
-		for (auto& triangle : m_Triangles)
-		{
-			if (GeometryUtils::HitTest_Triangle(triangle, ray))
-				return true;
-		}
-
-
-		//const int sizeVectorMesh{ static_cast<int>(m_TriangleMeshGeometries.size()) };
-		//for (int i{}; i < sizeVectorMesh; ++i)
-		//{
-		//	if (GeometryUtils::HitTest_TriangleMesh(m_TriangleMeshGeometries[i], ray))
+		//	if (GeometryUtils::HitTest_Triangle(triangle, ray))
 		//		return true;
 		//}
 
@@ -499,6 +417,7 @@ namespace dae {
 
 	void Scene_W4_ReferenceScene::Initialize()
 	{
+
 		sceneName = "Rederence Scene";
 		m_Camera.origin = { 0.0f, 3.0f, -9.0f };
 		m_Camera.fovAngle = 45.0f;

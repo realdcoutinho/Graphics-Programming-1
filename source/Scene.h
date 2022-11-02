@@ -44,6 +44,8 @@ namespace dae
 		const std::vector<Light>& GetLights() const { return m_Lights; }
 		const std::vector<Material*> GetMaterials() const { return m_Materials; }
 
+		bool m_SlabTestOn{ false };
+
 	protected:
 		std::string	sceneName;
 

@@ -15,8 +15,8 @@
 
 using namespace dae;
 
-#define ASYNC
-//#define PARALLEL_FOR
+//#define ASYNC
+#define PARALLEL_FOR
 //none of the above means they will be working with synchronous logic (no threading)
 
 
@@ -36,7 +36,7 @@ void Renderer::Render(Scene* pScene) const
 	camera.CalculateCameraToWorld();
 
 	float aspectRatio{ static_cast<float>(m_Width) / static_cast<float>(m_Height) };
-	float FOV{ tanf(camera.fovAngle * TO_RADIANS / 2) };
+	float FOV{ camera.m_FOV };
 
 	auto& materials = pScene->GetMaterials();
 	auto& lights = pScene->GetLights();
@@ -157,12 +157,16 @@ void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float 
 
 	if (closestHit.didHit)
 	{
-
 		for (const Light& light : lights)
 		{
 			Vector3 lightDirection{ LightUtils::GetDirectionToLight(light, closestHit.origin) };
 			float lightDistance = lightDirection.Normalize();
-			Ray lightRay{ closestHit.origin + (closestHit.normal * offset), lightDirection, 0.0001f, lightDistance };
+
+			float lambertCosine{ Vector3::Dot(closestHit.normal, lightDirection) }; //aka ObservedArea
+			if ((lambertCosine < 0))
+				continue;  // Skip if observedArea is negative
+
+			Ray lightRay{ closestHit.origin + (closestHit.normal * offset), lightDirection, offset, lightDistance };
 
 			if (m_ShadowsEnabled)
 			{
@@ -174,10 +178,7 @@ void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float 
 			const ColorRGB BRDF{ materials[closestHit.materialIndex]->Shade(closestHit, lightDirection, -rayDirection) };
 
 
-			float lambertCosine{ Vector3::Dot(closestHit.normal, lightDirection) }; //aka ObservedArea
 
-			if ((lambertCosine < 0))
-				continue;  // Skip if observedArea is negative
 
 			switch (m_CurrentLightingMode)
 			{

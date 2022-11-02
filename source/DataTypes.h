@@ -361,3 +361,18 @@ namespace dae
 	};
 #pragma endregion
 }
+
+
+
+
+//#define Sphere_Geometric
+//#define Sphere_Quadratic
+//#define Triangle_MollerTrumbore
+//#define Triangle_Geometric
+//
+//
+//#if defined(Sphere_Quadratic)
+//return HitTest_Sphere_Quadratic(sphere, ray, temp, true);
+//#elif defined(Sphere_Geometric)
+//return HitTest_Sphere_Geometric(sphere, ray, temp, true);
+//#endif

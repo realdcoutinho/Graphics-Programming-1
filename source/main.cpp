@@ -14,6 +14,8 @@
 
 using namespace dae;
 
+
+
 void ShutDown(SDL_Window* pWindow)
 {
 	SDL_DestroyWindow(pWindow);

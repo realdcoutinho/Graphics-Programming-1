@@ -3,6 +3,16 @@
 #include <fstream>
 #include "Math.h"
 #include "DataTypes.h"
+#include "Scene.h"
+
+//#define Sphere_Quadratic
+#define Sphere_Geometric
+#define Triangle_MollerTrumbore
+//#define Triangle_Geometric
+//#define SlabTestCheck
+
+
+extern bool m_SlabTestOn;
 
 namespace dae
 {
@@ -18,51 +28,85 @@ namespace dae
 
 			//return false;
 
-			////Quadratic equation A B and C
-			//float A{ Vector3::Dot(ray.direction, ray.direction) };
-			//float B{ Vector3::Dot(2 * ray.direction, ray.origin - sphere.origin) };
-			//float C{ Vector3::Dot(ray.origin - sphere.origin,  ray.origin - sphere.origin) - powf(sphere.radius, 2) };
+			#if defined(Sphere_Quadratic)
+			//Quadratic equation A B and C
+			float A{ Vector3::Dot(ray.direction, ray.direction) };
+			float B{ Vector3::Dot(2 * ray.direction, ray.origin - sphere.origin) };
+			float C{ Vector3::Dot(ray.origin - sphere.origin,  ray.origin - sphere.origin) - powf(sphere.radius, 2) };
 
-			//float tMax{ ray.max };
-			//float tMin{ ray.min };
-			//float discriminant{ powf(B, 2) - (4 * A * C) };
+			float tMax{ ray.max };
+			float tMin{ ray.min };
+			float discriminant{ powf(B, 2) - (4 * A * C) };
 
-			//if (discriminant < 0)
-			//{
-			//	ray does not intersect
-			//	hitRecord.didHit = false;
-			//	return false;
-			//}
-			//if (discriminant == 0)
-			//{
-			//	ray touches the sphere in one point
-			//	return false;
-			//}
-			//if (discriminant >= 0)
-			//{
-			//	float t{ (-B - sqrt(discriminant)) / 2 * A };
-			//	if (t >= tMin && t <= tMax)
-			//	{
-			//		ray touches intersects the sphere in two points
+			if (discriminant < 0)
+			{
+				//ray does not intersect
+				hitRecord.didHit = false;
+				return false;
+			}
+			if (discriminant == 0)
+			{
+				//ray touches the sphere in one point
+				return false;
+			}
+			if (discriminant >= 0)
+			{
+				float t{ (-B - sqrt(discriminant)) / 2 * A };
+				if (t >= tMin && t <= tMax)
+				{
+					//ray touches intersects the sphere in two points
 
-			//		Vector3 p{ ray.origin + t * ray.direction };
+					Vector3 p{ ray.origin + t * ray.direction };
 
-			//		Vector3 vectorSphereCenterToP{ p.x - sphere.origin.x, p.y - sphere.origin.y, p.z - sphere.origin.z };
+					Vector3 vectorSphereCenterToP{ p.x - sphere.origin.x, p.y - sphere.origin.y, p.z - sphere.origin.z };
 
-			//		hitRecord.didHit = true;
-			//		hitRecord.t = t;
-			//		hitRecord.origin = p;
-			//		hitRecord.materialIndex = sphere.materialIndex;
-			//		hitRecord.normal = vectorSphereCenterToP.Normalized();
+					hitRecord.didHit = true;
+					hitRecord.t = t;
+					hitRecord.origin = p;
+					hitRecord.materialIndex = sphere.materialIndex;
+					hitRecord.normal = vectorSphereCenterToP.Normalized();
+					return hitRecord.didHit;
+				}
+			}
+			return false;
 
 
-			//		return hitRecord.didHit;
-			//	}
+			#elif defined(Sphere_Geometric)
+			// Geometric Solution
+			Vector3 hitNormal{};
+			Vector3 L{ sphere.origin - ray.origin };
+			float dp{ Vector3::Dot(L,ray.direction) };
 
+			float od_squared{ L.SqrMagnitude() - (dp * dp) };
 
-			//}
-			//return false;
+			if (od_squared < (sphere.radius * sphere.radius))
+			{
+				float t_ca{ sqrtf(Square(sphere.radius) - od_squared) };
+				if ((dp - t_ca) > ray.min && (dp - t_ca) < ray.max)
+				{
+					if (!ignoreHitRecord)
+					{
+						hitRecord.didHit = true;
+						hitRecord.t = dp - t_ca;
+						hitRecord.origin = ray.origin + hitRecord.t * ray.direction;
+						hitNormal = hitRecord.origin - sphere.origin;
+						hitRecord.materialIndex = sphere.materialIndex;
+						hitRecord.normal = hitNormal.Normalized();
+					}
+					return true;
 
+				}
+				else
+					return false;
+			}
+			else
+				return false;
+			#endif
+
+		}
+
+		inline bool HitTest_Sphere_Geometric(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
+		{
 			// Geometric Solution
 			Vector3 hitNormal{};
 			Vector3 L{ sphere.origin - ray.origin };
@@ -97,13 +141,54 @@ namespace dae
 			{
 				return false;
 			}
-
-
 		}
 
-		inline bool HitTest_Sphere_Analytical()
+		inline bool HitTest_Sphere_Quadratic(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
+			//Quadratic equation A B and C
+			float A{ Vector3::Dot(ray.direction, ray.direction) };
+			float B{ Vector3::Dot(2 * ray.direction, ray.origin - sphere.origin) };
+			float C{ Vector3::Dot(ray.origin - sphere.origin,  ray.origin - sphere.origin) - powf(sphere.radius, 2) };
 
+			float tMax{ ray.max };
+			float tMin{ ray.min };
+			float discriminant{ powf(B, 2) - (4 * A * C) };
+
+			if (discriminant < 0)
+			{
+				//ray does not intersect
+				hitRecord.didHit = false;
+				return false;
+			}
+			if (discriminant == 0)
+			{
+				//ray touches the sphere in one point
+				return false;
+			}
+			if (discriminant >= 0)
+			{
+				float t{ (-B - sqrt(discriminant)) / 2 * A };
+				if (t >= tMin && t <= tMax)
+				{
+					//ray touches intersects the sphere in two points
+
+					Vector3 p{ ray.origin + t * ray.direction };
+
+					Vector3 vectorSphereCenterToP{ p.x - sphere.origin.x, p.y - sphere.origin.y, p.z - sphere.origin.z };
+
+					hitRecord.didHit = true;
+					hitRecord.t = t;
+					hitRecord.origin = p;
+					hitRecord.materialIndex = sphere.materialIndex;
+					hitRecord.normal = vectorSphereCenterToP.Normalized();
+
+
+					return hitRecord.didHit;
+				}
+
+
+			}
+			return false;
 		}
 
 		inline bool HitTest_Sphere(const Sphere& sphere, const Ray& ray)
@@ -117,22 +202,15 @@ namespace dae
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			//todo W1
-
 			float t{ Vector3::Dot((plane.origin - ray.origin), plane.normal) / Vector3::Dot(ray.direction, plane.normal) };
-			Vector3 p{ ray.origin + (t * ray.direction) };
-			float pX{ ray.origin.x + (t * ray.direction.x) };
-			float check{ Vector3::Dot(p - plane.origin, plane.normal) };
 
-			float tMax{ ray.max };
-			float tMin{ ray.min };
-
-			if (t >= tMin && t <= tMax)
+			if (t >= ray.min && t <= ray.max)
 			{
 				hitRecord.didHit = true;
 				hitRecord.materialIndex = plane.materialIndex;
 
 				hitRecord.t = t;
-				hitRecord.origin = p;
+				hitRecord.origin = ray.origin + (t * ray.direction);
 				hitRecord.normal = plane.normal;
 				return hitRecord.didHit;
 			}
@@ -164,7 +242,7 @@ namespace dae
 			tMax = std::min(tMax, std::max(ty1, ty2));
 
 			float tz1 = (mesh.transformedMinAABB.z - ray.origin.z) / ray.direction.z;
-			float tz2 = (mesh.transformedMinAABB.z - ray.origin.z) / ray.direction.z;
+			float tz2 = (mesh.transformedMaxAABB.z - ray.origin.z) / ray.direction.z;
 
 			tMin = std::max(tMin, std::min(tz1, tz2));
 			tMax = std::min(tMax, std::max(tz1, tz2));
@@ -321,15 +399,15 @@ namespace dae
 
 		inline bool HitTest_Triangle(const Triangle& triangle, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-
-			//return HitTest_TriangleIntersection(triangle, ray, hitRecord, ignoreHitRecord);
+			#if defined(Triangle_Geometric)
+			return HitTest_TriangleIntersection(triangle, ray, hitRecord, ignoreHitRecord);
+			#elif defined(Triangle_MollerTrumbore)
 			return HitTest_Triangle_MollerTrumbore(triangle, ray, hitRecord, ignoreHitRecord);
-			return false;
+			#endif
 		}
 
 		inline bool HitTest_Triangle(const Triangle& triangle, const Ray& ray)
 		{
-
 			HitRecord temp{};
 			return HitTest_Triangle(triangle, ray, temp, true);
 		}
@@ -337,10 +415,16 @@ namespace dae
 #pragma region TriangeMesh HitTest
 		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false, bool closestHit = false)
 		{
-			//return false;
-			////slabTest
-			if(SlabTest(mesh, ray))
-				return false;
+			#if defined(SlabTestCheck)
+				if(SlabTest(mesh, ray))
+					return false;
+			#endif
+
+				//if (m_SlabTestOn)
+				//{
+				//	if (SlabTest(mesh, ray))
+				//		return false;
+				//}
 
 
 			int sizeIndices{ static_cast<int>(mesh.indices.size()) };
@@ -349,6 +433,7 @@ namespace dae
 			tempTriangle.materialIndex = mesh.materialIndex;
 
 
+			HitRecord hitRecordTemTriangle{};
 			for(int index{}; index < sizeIndices; ++index)
 			{
 				tempTriangle.v0 = mesh.transformedPositions[mesh.indices[index]];
@@ -356,12 +441,7 @@ namespace dae
 				tempTriangle.v2 = mesh.transformedPositions[mesh.indices[++index]];
 				tempTriangle.normal = mesh.transformedNormals[index / 3];
 
-
-
-				HitRecord hitRecordTemTriangle{};
-				bool hitTriangle{ HitTest_Triangle(tempTriangle, ray, hitRecordTemTriangle, ignoreHitRecord) };
-
-				if (hitTriangle)
+				if (HitTest_Triangle(tempTriangle, ray, hitRecordTemTriangle, ignoreHitRecord))
 				{
 					if (!closestHit)
 					{
@@ -376,6 +456,7 @@ namespace dae
 				}
 			}
 			return false;
+
 		}
 
 
