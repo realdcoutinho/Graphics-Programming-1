@@ -32,23 +32,23 @@ namespace dae {
 
 	void dae::Scene::GetClosestHit(const Ray& ray, HitRecord& closestHit) const
 	{
+		HitRecord hitInfoSphere{};
 		for (auto& sphere : m_SphereGeometries)
 		{
-			HitRecord hitInfo{};
-			GeometryUtils::HitTest_Sphere(sphere, ray, hitInfo);
-			if (hitInfo.t < closestHit.t) // ask about it
+			GeometryUtils::HitTest_Sphere(sphere, ray, hitInfoSphere);
+			if (hitInfoSphere.t < closestHit.t) // ask about it
 			{
-				closestHit = hitInfo;
+				closestHit = hitInfoSphere;
 			}
 		}
 
+		HitRecord hitInfoPlane{};
 		for (auto& plane : m_PlaneGeometries)
 		{
-			HitRecord hitInfo{};
-			GeometryUtils::HitTest_Plane(plane, ray, hitInfo);
-			if (hitInfo.t < closestHit.t) // ask about it
+			GeometryUtils::HitTest_Plane(plane, ray, hitInfoPlane);
+			if (hitInfoPlane.t < closestHit.t) // ask about it
 			{
-				closestHit = hitInfo;
+				closestHit = hitInfoPlane;
 			}
 		}
 
@@ -62,13 +62,13 @@ namespace dae {
 		//	}
 		//}
 
+		HitRecord hitInfoTriangleMesh{};
 		for (auto& triangleMeshes : m_TriangleMeshGeometries)
 		{
-			HitRecord hitInfo{};
-			GeometryUtils::HitTest_TriangleMesh(triangleMeshes, ray, hitInfo, false, closestHit.didHit);
-			if (hitInfo.t < closestHit.t) // ask about it
+			GeometryUtils::HitTest_TriangleMesh(triangleMeshes, ray, hitInfoTriangleMesh);
+			if (hitInfoTriangleMesh.t < closestHit.t) // ask about it
 			{
-				closestHit = hitInfo;
+				closestHit = hitInfoTriangleMesh;
 			}
 		}
 	}

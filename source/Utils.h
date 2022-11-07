@@ -117,30 +117,25 @@ namespace dae
 			if (od_squared < (sphere.radius * sphere.radius))
 			{
 				float t_ca{ sqrtf(Square(sphere.radius) - od_squared) };
-				if ((dp - t_ca) > ray.min && (dp - t_ca) < ray.max)
+				float t = dp - t_ca;
+				if (t > ray.min && t < ray.max)
 				{
 					if (!ignoreHitRecord)
 					{
 						hitRecord.didHit = true;
-						hitRecord.t = dp - t_ca;
+						hitRecord.t = t;
 						hitRecord.origin = ray.origin + hitRecord.t * ray.direction;
 						hitNormal = hitRecord.origin - sphere.origin;
 						hitRecord.materialIndex = sphere.materialIndex;
 						hitRecord.normal = hitNormal.Normalized();
 					}
 					return true;
-
 				}
-
 				else
-				{
 					return false;
-				}
 			}
 			else
-			{
 				return false;
-			}
 		}
 
 		inline bool HitTest_Sphere_Quadratic(const Sphere& sphere, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
@@ -181,12 +176,8 @@ namespace dae
 					hitRecord.origin = p;
 					hitRecord.materialIndex = sphere.materialIndex;
 					hitRecord.normal = vectorSphereCenterToP.Normalized();
-
-
 					return hitRecord.didHit;
 				}
-
-
 			}
 			return false;
 		}
@@ -204,18 +195,15 @@ namespace dae
 			//todo W1
 			float t{ Vector3::Dot((plane.origin - ray.origin), plane.normal) / Vector3::Dot(ray.direction, plane.normal) };
 
-			if (t >= ray.min && t <= ray.max)
-			{
-				hitRecord.didHit = true;
-				hitRecord.materialIndex = plane.materialIndex;
-
-				hitRecord.t = t;
-				hitRecord.origin = ray.origin + (t * ray.direction);
-				hitRecord.normal = plane.normal;
-				return hitRecord.didHit;
-			}
-			return false;
-
+			if (!(t >= ray.min && t <= ray.max))
+				return false;
+		
+			hitRecord.t = t;
+			hitRecord.didHit = true;
+			hitRecord.materialIndex = plane.materialIndex;
+			hitRecord.origin = ray.origin + (t * ray.direction);
+			hitRecord.normal = plane.normal;
+			return hitRecord.didHit;
 		}
 
 		inline bool HitTest_Plane(const Plane& plane, const Ray& ray)
@@ -252,8 +240,8 @@ namespace dae
 
 		inline bool HitTest_TriangleIntersection(const Triangle& triangle, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			Vector3 triangleNormal{ triangle.normal }; 
-			float dot(Vector3::Dot(triangleNormal, ray.direction));
+			//Vector3 triangleNormal{ triangle.normal }; 
+			float dot(Vector3::Dot(triangle.normal, ray.direction));
 
 			if (dot == 0)
 				return false;
@@ -274,7 +262,7 @@ namespace dae
 
 			Vector3 center{ (triangle.v0 + triangle.v1 + triangle.v2) / 3 };
 			Vector3 L{ center - ray.origin };
-			float t{ (Vector3::Dot(L, triangleNormal)) / (Vector3::Dot(ray.direction, triangleNormal)) };
+			float t{ (Vector3::Dot(L, triangle.normal)) / (Vector3::Dot(ray.direction, triangle.normal)) };
 
 			float tMax{ ray.max };
 			float tMin{ ray.min };
@@ -282,18 +270,18 @@ namespace dae
 			if (t < tMin || t > tMax)
 				return false;
 
-			Vector3 hitPoint{ ray.origin + t * ray.direction };
-			Vector3 edge0{ triangle.v1 - triangle.v0 };
-			Vector3 edge1{ triangle.v2 - triangle.v1 };
-			Vector3 edge2{ triangle.v0 - triangle.v2 };
-			Vector3 pointToSide0{ hitPoint - triangle.v0 };
-			Vector3 pointToSide1{ hitPoint - triangle.v1 };
-			Vector3 pointToSide2{ hitPoint - triangle.v2 };
-			if (Vector3::Dot(triangleNormal, Vector3::Cross(edge0, pointToSide0)) < 0)
+			//Vector3 hitPoint{ ray.origin + t * ray.direction };
+			//Vector3 edge0{ triangle.v1 - triangle.v0 };
+			//Vector3 edge1{ triangle.v2 - triangle.v1 };
+			//Vector3 edge2{ triangle.v0 - triangle.v2 };
+			//Vector3 pointToSide0{ hitPoint - triangle.v0 };
+			//Vector3 pointToSide1{ hitPoint - triangle.v1 };
+			//Vector3 pointToSide2{ hitPoint - triangle.v2 };
+			if (Vector3::Dot(triangle.normal, Vector3::Cross(triangle.v1 - triangle.v0, (ray.origin + t * ray.direction) - triangle.v0)) < 0)
 				return false;
-			if (Vector3::Dot(triangleNormal, Vector3::Cross(edge1, pointToSide1)) < 0)
+			if (Vector3::Dot(triangle.normal, Vector3::Cross(triangle.v2 - triangle.v1, (ray.origin + t * ray.direction) - triangle.v1)) < 0)
 				return false;
-			if (Vector3::Dot(triangleNormal, Vector3::Cross(edge2, pointToSide2)) < 0)
+			if (Vector3::Dot(triangle.normal, Vector3::Cross(triangle.v0 - triangle.v2, (ray.origin + t * ray.direction) - triangle.v2)) < 0)
 				return false;
 
 
@@ -329,28 +317,28 @@ namespace dae
 			//if (dotSide < 0)
 			//	return false;
 
-			hitRecord.didHit = true;
+			
 			hitRecord.materialIndex = triangle.materialIndex;
-			hitRecord.origin = hitPoint;
-			hitRecord.normal = triangleNormal;
+			hitRecord.origin = (ray.origin + t * ray.direction);
+			hitRecord.normal = triangle.normal;
 			hitRecord.t = t;
-
-			return true;
+			return hitRecord.didHit = true;
 		}
 
 		inline bool HitTest_Triangle_MollerTrumbore(const Triangle& triangle, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
-			constexpr float kEpsilon = 1e-8;
+			constexpr float kEpsilon = 1e-8f;
 
 			Vector3 v0v1 = triangle.v1 - triangle.v0;
 			Vector3 v0v2 = triangle.v2 - triangle.v0;
-
 			Vector3 pvec = Vector3::Cross(ray.direction, v0v2);
 			float determinant = Vector3::Dot(v0v1, pvec);
 
-
-
-			if (determinant < -kEpsilon)
+			//if (determinant == kEpsilon)
+			//{
+			//return false;
+			//}
+			if (determinant < kEpsilon)
 			{
 				if (ignoreHitRecord && TriangleCullMode::FrontFaceCulling == triangle.cullMode)
 					return false;
@@ -364,37 +352,30 @@ namespace dae
 				if (!ignoreHitRecord && TriangleCullMode::FrontFaceCulling == triangle.cullMode)
 					return false;
 			}
-			else
-			{
-				return false;
-			}
 
 			float invDet = 1 / determinant;
 
 			Vector3 tvec = ray.origin - triangle.v0;
 			float u = Vector3::Dot(tvec, pvec) * invDet;
-			if (u < 0 || u > 1) return false;
+			if (u < 0 || u > 1) 
+				return false;
 
 			Vector3 qvec = Vector3::Cross(tvec, v0v1);
 			float v = Vector3::Dot(ray.direction, qvec) * invDet;
-			if (v < 0 || u + v > 1) return false;
+			if (v < 0 || u + v > 1) 
+				return false;
 
 			float t = Vector3::Dot(v0v2, qvec) * invDet;
 			
 			if (t < ray.min || t > ray.max)
 				return false;
 
-			if (t > kEpsilon)
-			{
-				hitRecord.didHit = true;
-				hitRecord.materialIndex = triangle.materialIndex;
-				hitRecord.origin = ray.origin + (t * ray.direction);
-				hitRecord.normal = triangle.normal;
-				hitRecord.t = t;
-				return true;
-			}
-			return false;
-
+			
+			hitRecord.materialIndex = triangle.materialIndex;
+			hitRecord.origin = ray.origin + (t * ray.direction);
+			hitRecord.normal = triangle.normal;
+			hitRecord.t = t;
+			return hitRecord.didHit = true;
 		}
 
 		inline bool HitTest_Triangle(const Triangle& triangle, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
@@ -413,19 +394,12 @@ namespace dae
 		}
 #pragma endregion
 #pragma region TriangeMesh HitTest
-		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false, bool closestHit = false)
+		inline bool HitTest_TriangleMesh(const TriangleMesh& mesh, const Ray& ray, HitRecord& hitRecord, bool ignoreHitRecord = false)
 		{
 			#if defined(SlabTestCheck)
 				if(SlabTest(mesh, ray))
 					return false;
 			#endif
-
-				//if (m_SlabTestOn)
-				//{
-				//	if (SlabTest(mesh, ray))
-				//		return false;
-				//}
-
 
 			int sizeIndices{ static_cast<int>(mesh.indices.size()) };
 			Triangle tempTriangle;
@@ -441,20 +415,37 @@ namespace dae
 				tempTriangle.v2 = mesh.transformedPositions[mesh.indices[++index]];
 				tempTriangle.normal = mesh.transformedNormals[index / 3];
 
-				if (HitTest_Triangle(tempTriangle, ray, hitRecordTemTriangle, ignoreHitRecord))
+				//if (HitTest_Triangle(tempTriangle, ray, hitRecordTemTriangle, ignoreHitRecord))
+				//{
+				//	if (!closestHit)
+				//	{
+				//		hitRecord = hitRecordTemTriangle;
+				//		return true;
+				//	}
+				//	else
+				//	{
+				//		if (hitRecordTemTriangle.t < hitRecord.t && hitRecordTemTriangle.t > 0.0f)
+				//			hitRecord = hitRecordTemTriangle;
+				//	}
+				//}
+
+				bool didHit{ HitTest_Triangle(tempTriangle, ray, hitRecordTemTriangle, ignoreHitRecord) };
+				if (didHit && ignoreHitRecord)
 				{
-					if (!closestHit)
-					{
-						hitRecord = hitRecordTemTriangle;
-						return true;
-					}
-					else
-					{
-						if (hitRecordTemTriangle.t < hitRecord.t && hitRecordTemTriangle.t > 0.0f)
-							hitRecord = hitRecordTemTriangle;
-					}
+					return true;
+				}
+
+				if (hitRecord.t < hitRecordTemTriangle.t && didHit)
+				{
+					hitRecordTemTriangle = hitRecord;
 				}
 			}
+			if (hitRecordTemTriangle.didHit)
+			{
+				hitRecord = hitRecordTemTriangle;
+				return true;
+			}
+
 			return false;
 
 		}
