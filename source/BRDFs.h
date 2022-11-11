@@ -33,10 +33,10 @@ namespace dae
 		static ColorRGB Phong(float ks, float exp, const Vector3& l, const Vector3& v, const Vector3& n)
 		{
 			//todo: W3
-			Vector3 reflect{ l - 2 * (Vector3::Dot(n, l)) * n };
-			float cosineAlpha{ std::max(0.0f, Vector3::Dot(reflect, v))};
-			float phongSpecularReflection{ ks * (powf(cosineAlpha, exp)) };
-			ColorRGB Phong{ phongSpecularReflection , phongSpecularReflection , phongSpecularReflection };
+			const Vector3 reflect{ l - 2 * (Vector3::Dot(n, l)) * n };
+			const float cosineAlpha{ std::max(0.0f, Vector3::Dot(reflect, v))};
+			const float phongSpecularReflection{ ks * (powf(cosineAlpha, exp)) };
+			const ColorRGB Phong{ phongSpecularReflection , phongSpecularReflection , phongSpecularReflection };
 			return Phong;
 		}
 

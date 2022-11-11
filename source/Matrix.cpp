@@ -104,11 +104,11 @@ namespace dae {
 
 	Matrix Matrix::CreateTranslation(float x, float y, float z)
 	{
-		Vector4 line1{ 1, 0, 0, x };
-		Vector4 line2{ 0, 1, 0, y };
-		Vector4 line3{ 0, 0, 0, z };
-		Vector4 line4{ 0, 0, 0, 1 };
-		Matrix matrixTranslation{ line1, line2, line3, line4 };
+		const Vector4 line1{ 1, 0, 0, x };
+		const Vector4 line2{ 0, 1, 0, y };
+		const Vector4 line3{ 0, 0, 0, z };
+		const Vector4 line4{ 0, 0, 0, 1 };
+		const Matrix matrixTranslation{ line1, line2, line3, line4 };
 		return matrixTranslation;
 	}
 
@@ -119,37 +119,48 @@ namespace dae {
 
 	inline Matrix Matrix::CreateRotationX(float pitch)
 	{
-		//todo W1
-		Vector4 line1{ 1, 0, 0, 0 };
-		Vector4 line2{ 0, cosf(pitch), -1 * sinf(pitch), 0 };
-		Vector4 line3{ 0, sinf(pitch), cosf(pitch), 0 };
-		Vector4 line4{ 0, 0, 0, 1 };
+		const float cosine = cosf(pitch);
+		const float sine = sinf(pitch);
 
-		Matrix matrixPitch{ line1, line2, line3, line4 };
+		//todo W1
+		const Vector4 line1{ 1, 0, 0, 0 };
+		const Vector4 line2{ 0, cosine, -1 * sine, 0 };
+		const Vector4 line3{ 0, sine, cosine, 0 };
+		const Vector4 line4{ 0, 0, 0, 1 };
+
+		const Matrix matrixPitch{ line1, line2, line3, line4 };
 		return matrixPitch;
 	}
 
 	Matrix Matrix::CreateRotationY(float yaw)
 	{
-		//todo W1
-		Vector4 line1{ cosf(yaw), 0, -1 * sinf(yaw), 0 };
-		Vector4 line2{ 0, 1, 0, 0 };
-		Vector4 line3{ sinf(yaw), 0, cosf(yaw), 0 };
-		Vector4 line4{ 0, 0, 0, 1 };
+		const float cosine = cosf(yaw);
+		const float sine = sinf(yaw);
 
-		Matrix matrixYaw{ line1, line2, line3, line4 };
+
+		//todo W1
+		const Vector4 line1{ cosine, 0, -1 * sine, 0 };
+		const Vector4 line2{ 0, 1, 0, 0 };
+		const Vector4 line3{ sine, 0, cosine, 0 };
+		const Vector4 line4{ 0, 0, 0, 1 };
+
+		const Matrix matrixYaw{ line1, line2, line3, line4 };
 		return matrixYaw;
 	}
 
 	Matrix Matrix::CreateRotationZ(float roll)
 	{
 		//todo W1
-		Vector4 line1{ cosf(roll), sinf(roll), 0, 0 };
-		Vector4 line2{ -1 * sinf(roll), cosf(roll), 0, 0 };
-		Vector4 line3{ 0, 0, 1, 0 };
-		Vector4 line4{ 0, 0, 0, 1 };
+		const float cosine = cosf(roll);
+		const float sine = sinf(roll);
+
+
+		const Vector4 line1{ cosine, sine, 0, 0 };
+		const Vector4 line2{ -1 * sine, cosine, 0, 0 };
+		const Vector4 line3{ 0, 0, 1, 0 };
+		const Vector4 line4{ 0, 0, 0, 1 };
 		
-		Matrix matrixRoll{ line1, line2, line3, line4 };
+		const Matrix matrixRoll{ line1, line2, line3, line4 };
 		return matrixRoll;
 	}
 
@@ -166,12 +177,12 @@ namespace dae {
 	Matrix Matrix::CreateScale(float sx, float sy, float sz)
 	{
 		//todo W1
-		Vector4 line1{ sx, 0, 0, 0 };
-		Vector4 line2{ 0, sy, 0, 0 };
-		Vector4 line3{ 0, 0, sz, 0 };
-		Vector4 line4{ 0, 0, 0, 1 };
+		const Vector4 line1{ sx, 0, 0, 0 };
+		const Vector4 line2{ 0, sy, 0, 0 };
+		const Vector4 line3{ 0, 0, sz, 0 };
+		const Vector4 line4{ 0, 0, 0, 1 };
 
-		Matrix matrixScale{ line1, line2, line3, line4 };
+		const Matrix matrixScale{ line1, line2, line3, line4 };
 		return matrixScale;
 	}
 

@@ -14,6 +14,24 @@ namespace dae
 		float radius{};
 
 		unsigned char materialIndex{ 0 };
+
+
+		Vector3 minAABB{};
+		Vector3 maxAABB{};
+
+		//void CalculateAABB()
+		//{
+		//	//minAABB
+		//	minAABB.x = origin.x - radius;
+		//	minAABB.y = origin.y - radius;
+		//	minAABB.z = origin.z - radius;
+
+		//	//maxAABB
+		//	maxAABB.x = origin.x + radius;
+		//	maxAABB.y = origin.y + radius;
+		//	maxAABB.z = origin.z + radius;
+		//}
+
 	};
 
 	struct Plane
@@ -37,10 +55,6 @@ namespace dae
 		Triangle(const Vector3& _v0, const Vector3& _v1, const Vector3& _v2, const Vector3& _normal):
 			v0{_v0}, v1{_v1}, v2{_v2}, normal{_normal.Normalized()}
 		{
-			//positions.push_back(v0);
-			//positions.push_back(v1);
-			//positions.push_back(v2);
-			//UpdateAABB();
 		}
 
 		Triangle(const Vector3& _v0, const Vector3& _v1, const Vector3& _v2) :
@@ -61,27 +75,9 @@ namespace dae
 		unsigned char materialIndex{};
 
 
-
-		Vector3 minAABB{};
-		Vector3 maxAABB{};
-
 		std::vector<Vector3> positions{};
 
 
-
-		//void UpdateAABB()
-		//{
-		//	if (positions.size() > 0)
-		//	{
-		//		minAABB = positions[0];
-		//		maxAABB = positions[0];
-		//		for (auto& pos : positions)
-		//		{
-		//			minAABB = Vector3::Min(pos, minAABB);
-		//			maxAABB = Vector3::Min(pos, maxAABB);
-		//		}
-		//	}
-		//}
 
 
 	};
@@ -161,7 +157,7 @@ namespace dae
 				for (auto& pos : positions)
 				{
 					minAABB = Vector3::Min(pos, minAABB);
-					maxAABB = Vector3::Min(pos, maxAABB);
+					maxAABB = Vector3::Max(pos, maxAABB);
 				}
 			}
 		}
@@ -244,15 +240,15 @@ namespace dae
 		{
 			int startIndex = static_cast<int>(positions.size());
 
-			positions.push_back(triangle.v0);
-			positions.push_back(triangle.v1);
-			positions.push_back(triangle.v2);
+			positions.emplace_back(triangle.v0);
+			positions.emplace_back(triangle.v1);
+			positions.emplace_back(triangle.v2);
 
-			indices.push_back(startIndex);
-			indices.push_back(++startIndex);
-			indices.push_back(++startIndex);
+			indices.emplace_back(startIndex);
+			indices.emplace_back(++startIndex);
+			indices.emplace_back(++startIndex);
 
-			normals.push_back(triangle.normal);
+			normals.emplace_back(triangle.normal);
 
 			//Not ideal, but making sure all vertices are updated
 			if(!ignoreTransformUpdate)
@@ -272,17 +268,13 @@ namespace dae
 
 				Vector3 edgeA{ v1 - v0 };
 				Vector3 edgeB{ v2 - v1 };
-				//Vector3 edgeC{ v0 - v2 };
 
 				Vector3 aCrossB{ Vector3::Cross(edgeA, edgeB) };
-				//Vector3 bCrossC{ Vector3::Cross(edgeB, edgeC) };
-				//Vector3 cCrossA{ Vector3::Cross(edgeC, edgeA) };
 
 				Vector3 normalOne{ aCrossB.Normalized() };
-				//Vector3 normalTwo{ bCrossC.Normalized() };
-				//Vector3 normalThree{ cCrossA.Normalized() };
 
-				normals.push_back(normalOne);
+
+				normals.emplace_back(normalOne);
 			}
 		}
 
@@ -307,13 +299,8 @@ namespace dae
 			transformedNormals.reserve(normals.size());
 			for (Vector3& nom : normals)
 			{
-				Vector3 transNom{ finalTransform.TransformVector(nom) };
+				Vector3 transNom{ rotationTransform.TransformVector(nom) };
 				transformedNormals.emplace_back(transNom);
-			}
-
-			for (auto& p : positions)
-			{
-				transformedPositions.emplace_back(finalTransform.TransformPoint(p));
 			}
 
 			//Update AABB
@@ -361,18 +348,3 @@ namespace dae
 	};
 #pragma endregion
 }
-
-
-
-
-//#define Sphere_Geometric
-//#define Sphere_Quadratic
-//#define Triangle_MollerTrumbore
-//#define Triangle_Geometric
-//
-//
-//#if defined(Sphere_Quadratic)
-//return HitTest_Sphere_Quadratic(sphere, ray, temp, true);
-//#elif defined(Sphere_Geometric)
-//return HitTest_Sphere_Geometric(sphere, ray, temp, true);
-//#endif

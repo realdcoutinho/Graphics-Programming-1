@@ -35,7 +35,7 @@ int main(int argc, char* args[])
 	const uint32_t height = 480;
 
 	SDL_Window* pWindow = SDL_CreateWindow(
-		"RayTracer - **Insert Name**",
+		"RayTracer - Diogo de Moura Coutinho",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
 		width, height, 0);
@@ -48,6 +48,7 @@ int main(int argc, char* args[])
 	const auto pRenderer = new Renderer(pWindow);
 
 	const auto pScene = new Scene_W4_ReferenceScene();
+	//const auto pScene = new Scene_W4_Bunny();
 	pScene->Initialize();
 
 	//Start loop
@@ -73,10 +74,11 @@ int main(int argc, char* args[])
 					pRenderer->ToggleShadows();
 				if (e.key.keysym.scancode == SDL_SCANCODE_F3)
 					pRenderer->CycleLightingMode();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F6)
+					pTimer->StartBenchmark();
 				break;
 			}
 		}
-
 		//--------- Update ---------
 		pScene->Update(pTimer);
 		pScene->GetCamera().Update(pTimer);

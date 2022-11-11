@@ -32,26 +32,22 @@ namespace dae {
 
 	void dae::Scene::GetClosestHit(const Ray& ray, HitRecord& closestHit) const
 	{
-		HitRecord hitInfoSphere{};
-		for (auto& sphere : m_SphereGeometries)
+		HitRecord hitInfo{};
+		for (const auto& sphere : m_SphereGeometries)
 		{
-			GeometryUtils::HitTest_Sphere(sphere, ray, hitInfoSphere);
-			if (hitInfoSphere.t < closestHit.t) // ask about it
-			{
-				closestHit = hitInfoSphere;
-			}
+			GeometryUtils::HitTest_Sphere(sphere, ray, hitInfo);
+			if (hitInfo.t < closestHit.t)
+				closestHit = hitInfo;
 		}
 
-		HitRecord hitInfoPlane{};
-		for (auto& plane : m_PlaneGeometries)
+		for (const auto& plane : m_PlaneGeometries)
 		{
-			GeometryUtils::HitTest_Plane(plane, ray, hitInfoPlane);
-			if (hitInfoPlane.t < closestHit.t) // ask about it
-			{
-				closestHit = hitInfoPlane;
-			}
+			GeometryUtils::HitTest_Plane(plane, ray, hitInfo);
+			if (hitInfo.t < closestHit.t)
+				closestHit = hitInfo;
 		}
 
+		// no need to do triangle hit tests from here because there are no more individual triangles in the scene
 		//for (auto& triangle : m_Triangles)
 		//{
 		//	HitRecord hitInfo{};
@@ -62,27 +58,25 @@ namespace dae {
 		//	}
 		//}
 
-		HitRecord hitInfoTriangleMesh{};
-		for (auto& triangleMeshes : m_TriangleMeshGeometries)
+	
+		for (const auto& triangleMeshes : m_TriangleMeshGeometries)
 		{
-			GeometryUtils::HitTest_TriangleMesh(triangleMeshes, ray, hitInfoTriangleMesh);
-			if (hitInfoTriangleMesh.t < closestHit.t) // ask about it
-			{
-				closestHit = hitInfoTriangleMesh;
-			}
+			GeometryUtils::HitTest_TriangleMesh(triangleMeshes, ray, hitInfo);
+			if (hitInfo.t < closestHit.t)
+				closestHit = hitInfo;
 		}
 	}
 
 	bool Scene::DoesHit(const Ray& ray) const
 	{
 
-		for (auto& sphere : m_SphereGeometries)
+		for (const auto& sphere : m_SphereGeometries)
 		{
 			if (GeometryUtils::HitTest_Sphere(sphere, ray))
 				return true;
 		}
 
-		//comented out because planes are not casting shadows, I believe
+		//comented out because planes are not casting shadows, therefore no need for this check for any of the scenes. I asked, said it was no problem
 		//for (auto& plane : m_PlaneGeometries)
 		//{
 		//	if (GeometryUtils::HitTest_Plane(plane, ray))
@@ -95,7 +89,7 @@ namespace dae {
 		//		return true;
 		//}
 
-		for (auto& triangleMeshes : m_TriangleMeshGeometries)
+		for (const auto& triangleMeshes : m_TriangleMeshGeometries)
 		{
 			if (GeometryUtils::HitTest_TriangleMesh(triangleMeshes, ray))
 				return true;
@@ -338,32 +332,6 @@ namespace dae {
 		AddPlane(Vector3{ 5.0f, 0.0f, 10.0f }, Vector3{ -1.0f, 0.0f, 0.0f }, matLambert_GrayBlue); //RIGHT
 		AddPlane(Vector3{ -5.0f, 0.0f, 10.0f }, Vector3{ 1.0f, 0.0f, 0.0f }, matLambert_GrayBlue); //LEFT
 
-		////Triangle (Temp)
-		//auto triangle = Triangle{ {-0.75f, 0.5f, 0.0f}, {-0.75f, 2.0f, 0.0f}, {0.75f, 0.5f, 0.0f } };
-
-		//triangle.cullMode = TriangleCullMode::NoCulling;
-		//triangle.materialIndex = matLamber_White;
-
-		//m_Triangles.emplace_back(triangle);
-
-		//const auto triangleMesh = AddTriangleMesh(TriangleCullMode::NoCulling, matLamber_White);
-		//triangleMesh->positions = { 
-		//	{-0.75f, -1.0f, 0.0f}, 
-		//	{-0.75f, 1.0f, 0.0f}, 
-		//	{0.75f, 1.0f, 1.0f}, 
-		//	{0.75, -1.0f, 0.0f} };
-		//triangleMesh->indices = {
-		//	0, 1, 2, //Triangle1
-		//	0, 2, 3 //Triangle2
-		//};
-
-		//triangleMesh->CalculateNormals();
-
-		//triangleMesh->Translate({ 0.0f, 1.5f, 0.0f });
-		//triangleMesh->RotateY(45);
-
-		//triangleMesh->UpdateTransforms();
-
 
 
 		pMesh = AddTriangleMesh(TriangleCullMode::NoCulling, matLamber_White);
@@ -383,16 +351,6 @@ namespace dae {
 		pMesh->Translate({ 0.0f, 1.5f, 0.0f });
 
 		pMesh->UpdateTransforms();
-
-
-		//pMesh = AddTriangleMesh(TriangleCullMode::BackFaceCulling, matLamber_White);
-		//Utils::ParseOBJ("Resources/simple_cube.obj", pMesh->positions, pMesh->normals, pMesh->indices);
-
-		//pMesh->Scale({ 0.7f, 0.7f, 0.7f });
-		//pMesh->Translate({ 0.0f, 1.0f, 0.0f });
-
-		//pMesh->UpdateTransforms();
-
 
 
 
@@ -452,21 +410,25 @@ namespace dae {
 		m_Meshes[0] = AddTriangleMesh(TriangleCullMode::BackFaceCulling, matLamber_White);
 		m_Meshes[0]->AppendTriangle(baseTriangle, true);
 		m_Meshes[0]->Translate({ -1.75f, 4.5f, 0.0f });
+		m_Meshes[0]->UpdateAABB();
 		m_Meshes[0]->UpdateTransforms();
 
 		m_Meshes[1] = AddTriangleMesh(TriangleCullMode::FrontFaceCulling, matLamber_White);
 		m_Meshes[1]->AppendTriangle(baseTriangle, true);
 		m_Meshes[1]->Translate({ 0.0f, 4.5f, 0.0f });
+		m_Meshes[1]->UpdateAABB();
 		m_Meshes[1]->UpdateTransforms();
 
 		m_Meshes[2] = AddTriangleMesh(TriangleCullMode::NoCulling, matLamber_White);
 		m_Meshes[2]->AppendTriangle(baseTriangle, true);
 		m_Meshes[2]->Translate({ 1.75f, 4.5f, 0.0f });
+		m_Meshes[2]->UpdateAABB();
 		m_Meshes[2]->UpdateTransforms();
 
 		AddPointLight({ 0.f,  5.f,  5.f }, 50.f, ColorRGB{ 1.f, 0.61f, 0.45f });
 		AddPointLight({ -2.5f,  5.f, -5.f }, 70.f, ColorRGB{ 1.f,  0.8f, 0.45f });
 		AddPointLight({ 2.5f, 2.5f, -5.f }, 50.f, ColorRGB{ 0.34f, 0.47f, 0.68f });
+
 	}
 
 	void Scene_W4_ReferenceScene::Update(Timer* pTimer)
@@ -483,7 +445,7 @@ namespace dae {
 
 	void Scene_W4_Bunny::Initialize()
 	{
-		m_Camera.origin = { 0.0f, 1.0f, -5.0f };
+		m_Camera.origin = { 0.0f, 3.0f, -9.0f };
 
 		m_Camera.fovAngle = 45.0f;
 
@@ -509,19 +471,23 @@ namespace dae {
 		pMesh->Scale({ 2.0f, 2.0f, 2.0f });
 		pMesh->UpdateAABB();
 
-
-
-		pMesh->RotateY(M_PI);
-
 		pMesh->UpdateTransforms();
 
 		//Lights
 		AddPointLight({ 0.0f, 5.0f, 5.0f }, 50.0f, { 1.0f, 0.61f, 0.45f });
 		AddPointLight({ -2.5f, 5.0f, -5.0f }, 70.0f, { 1.0f, 0.8f, 0.45f });
 		AddPointLight({ 2.5f, 5.0f, -5.0f }, 50.0f, { 0.34f, 0.47f, 0.68f });
-
-
 	}
+
+	void Scene_W4_Bunny::Update(Timer* pTimer)
+	{
+		Scene::Update(pTimer);
+
+		const auto yawAngle = (cos(pTimer->GetTotal()) + 1.0f) / 2.0f * PI_2;
+		pMesh->RotateY(yawAngle);
+		pMesh->UpdateTransforms();
+	}
+
 
 }
 

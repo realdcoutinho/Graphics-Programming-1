@@ -18,46 +18,41 @@ namespace dae
 	{
 		Camera() = default;
 
-		Camera(const Vector3& _origin, float _fovAngle):
-			origin{_origin},
-			fovAngle{_fovAngle}
+		Camera(const Vector3& _origin, float _fovAngle) :
+			origin{ _origin },
+			fovAngle{ _fovAngle }
 		{
 		}
 
 		Vector3 origin{};
-		float fovAngle{45.f};
+		float fovAngle{ 45.f };
 		const float cameraVelocity{ 5.f };
 
 		//mine
-		float m_FOV{ tanf(fovAngle * TO_RADIANS / 2) };
+		float fov{ tanf(fovAngle * TO_RADIANS / 2) };
 
-
+	
 		Vector3 worldUp{ Vector3::UnitY };
-		Vector3 forward{Vector3::UnitZ};
-		Vector3 up{Vector3::UnitY};
-		Vector3 right{Vector3::UnitX};
+		Vector3 forward{ Vector3::UnitZ };
+		Vector3 up{ Vector3::UnitY };
+		Vector3 right{ Vector3::UnitX };
 
-		float totalPitch{0.f};
-		float totalYaw{0.f};
+		float totalPitch{ 0.f };
+		float totalYaw{ 0.f };
 
 		Matrix cameraToWorld{};
 
-		void UpdateCameraFOV()
-		{
-			m_FOV = tanf(fovAngle * TO_RADIANS / 2);
-		}
-
 		Matrix CalculateCameraToWorld()
 		{
-			right	= Vector3::Cross(worldUp, forward) ;
+			right = Vector3::Cross(worldUp, forward);
 			right.Normalize();
-			up		= Vector3::Cross(forward, right) ;
+			up = Vector3::Cross(forward, right);
 			up.Normalize();
-			
-			Vector4 rightVector4{ right, 0 },
-				upVector4{ up, 0 },
-				forwardVector4{ forward, 0 },
-				originVector4{ origin, 1 };
+
+			const Vector4 rightVector4{ right, 0 },
+					upVector4{ up, 0 },
+					forwardVector4{ forward, 0 },
+					originVector4{ origin, 1 };
 
 			Matrix ONB{ rightVector4, upVector4, forwardVector4, originVector4 };
 			cameraToWorld = ONB;
@@ -69,85 +64,56 @@ namespace dae
 			const float deltaTime = pTimer->GetElapsed();
 
 			//Keyboard Input
-			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
-
-			if (pKeyboardState[SDL_SCANCODE_W])
-				origin += forward * cameraVelocity * deltaTime;
-			if (pKeyboardState[SDL_SCANCODE_S])
-				origin -= forward *cameraVelocity * deltaTime;
-			if (pKeyboardState[SDL_SCANCODE_D])
-				origin += right * cameraVelocity * deltaTime;
-			if (pKeyboardState[SDL_SCANCODE_A])
-				origin -= right * cameraVelocity * deltaTime;
-			if (pKeyboardState[SDL_SCANCODE_E])
-				origin += up * cameraVelocity * deltaTime;
-			if (pKeyboardState[SDL_SCANCODE_Q])
-				origin -= up *  cameraVelocity * deltaTime;
-			if (pKeyboardState[SDL_SCANCODE_UP])
-				fovAngle +=1.0f;
-				UpdateCameraFOV();
-			if (pKeyboardState[SDL_SCANCODE_DOWN])
-				fovAngle -= 1.0f;
-				UpdateCameraFOV();
+			KeyboardInput(deltaTime);
 
 			//Mouse Input
-			int mouseX{}, mouseY{};
-			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
-		
-			if (mouseState == SDL_BUTTON_LEFT)
-			{
-				//while (SDL_BUTTON_LEFT)
-				//{
-					Matrix rotationY{ Matrix::CreateRotationY(static_cast<float>(mouseX * TO_RADIANS)) };
-					Matrix rotationZ{ Matrix::CreateRotationZ(static_cast<float>(mouseY * TO_RADIANS)) };
-					forward = rotationY.TransformVector(forward);
-					forward.Normalize();
-					forward = rotationZ.TransformVector(forward);
-					forward.Normalize();
-				//}
+			MouseInput(deltaTime);
+		}
 
+		void KeyboardInput(float deltaTime)
+		{
+			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
+
+			if (pKeyboardState[SDL_SCANCODE_W] || pKeyboardState[SDL_SCANCODE_S] || pKeyboardState[SDL_SCANCODE_D] || pKeyboardState[SDL_SCANCODE_A])
+			{
+				origin += forward * cameraVelocity * deltaTime * pKeyboardState[SDL_SCANCODE_W];
+				origin += forward * cameraVelocity * -deltaTime * pKeyboardState[SDL_SCANCODE_S];
+				origin += right * cameraVelocity * deltaTime * pKeyboardState[SDL_SCANCODE_D];
+				origin += right * cameraVelocity * -deltaTime * pKeyboardState[SDL_SCANCODE_A];
+				//fovAngle += 1 * pKeyboardState[SDL_SCANCODE_UP];
+				//fovAngle += 1 * pKeyboardState[SDL_SCANCODE_DOWN];
+				//m_FOV = tanf(fovAngle * TO_RADIANS / 2) * pKeyboardState[SDL_SCANCODE_UP];
+				//m_FOV = tanf(fovAngle * TO_RADIANS / 2) * pKeyboardState[SDL_SCANCODE_DOWN];
 			}
 
-
-
-		
-			//SDL_Event event;
-			//while (SDL_PollEvent(&event))
-			//{
-			//	fovAngle += 1.0f;
-			//	if (event.type == SDL_MOUSEWHEEL)
-			//	{
-			//		std::cout << "ROLLING UP" << '\n';
-			//		if (event.wheel.y > 0) // scroll up
-			//		{
-			//			fovAngle += 1.0f;
-			//			std::cout << "ROLLING UP" << '\n';
-			//			// Put code for handling "scroll up" here!
-			//		}
-			//		else if (event.wheel.y < 0) // scroll down
-			//		{
-			//			std::cout << "ROLLING DOWN" << '\n';
-			//
-			//			fovAngle -= 1.0f;
-			//			// Put code for handling "scroll down" here!
-			//		}
-			//
-			//		if (event.wheel.x > 0) // scroll right
-			//		{
-			//			// ...
-			//		}
-			//		else if (event.wheel.x < 0) // scroll left
-			//		{
-			//			// ...
-			//		}
-			//	}
-			//	else if (event.type == SDL_MOUSEBUTTONDOWN)
-			//	{
-			//		// ... handle mouse clicks ...
-			//	}
-			//
-			//	// ... handle other kinds of events ...
-			//}
 		}
+
+		void MouseInput(float deltaTime)
+		{
+			int mouseX{}, mouseY{};
+			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
+
+			const float leftMouse{ static_cast<float>(mouseState & SDL_BUTTON(SDL_BUTTON_LEFT)) };
+			const float rightMouse{ static_cast<float>(mouseState & SDL_BUTTON(SDL_BUTTON_RIGHT)) };
+
+			if (mouseState)
+			{
+				if (leftMouse && rightMouse)
+				{
+					origin += Vector3::UnitY * -deltaTime * static_cast<float>(mouseY) * cameraVelocity;
+					return;
+				}
+				origin += forward * -deltaTime * static_cast<float>(mouseY) * cameraVelocity * leftMouse;
+
+				totalYaw += deltaTime * static_cast<float>(mouseX) * leftMouse;
+				totalYaw += deltaTime * static_cast<float>(mouseX) * rightMouse;
+
+				totalPitch += -deltaTime * static_cast<float>(mouseY) * rightMouse;
+
+				const Matrix finalRotation{ Matrix::CreateRotation(totalPitch, totalYaw, 0) };
+				forward = finalRotation.TransformVector(Vector3::UnitZ);
+			}
+		}
+
 	};
 }

@@ -36,16 +36,16 @@ void Renderer::Render(Scene* pScene) const
 	camera.CalculateCameraToWorld();
 
 	float aspectRatio{ static_cast<float>(m_Width) / static_cast<float>(m_Height) };
-	float FOV{ camera.m_FOV };
+	float FOV{ camera.fov };
 
 	auto& materials = pScene->GetMaterials();
 	auto& lights = pScene->GetLights();
 
 	const uint32_t numPixels = m_Width * m_Height;
 	
-	float offset{ 0.0001f };
+	const float offset{ 0.0001f };
 
-	int lightSize{ static_cast<int>(lights.size()) };
+
 
 #if defined(ASYNC)
 	const uint32_t numCores			{ std::thread::hardware_concurrency() };
@@ -153,6 +153,8 @@ void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float 
 
 	ColorRGB finalColor{};
 	HitRecord closestHit{};
+	ColorRGB eRGB{};
+	ColorRGB BRDF{};
 	pScene->GetClosestHit(viewRay, closestHit);
 
 	if (closestHit.didHit)
@@ -174,11 +176,10 @@ void Renderer::RenderPixel(Scene* pScene, uint32_t pixelIndex, float fov, float 
 					continue;
 			}
 
-			ColorRGB eRGB{ LightUtils::GetRadiance(light, closestHit.origin) };
-			const ColorRGB BRDF{ materials[closestHit.materialIndex]->Shade(closestHit, lightDirection, -rayDirection) };
+			eRGB = LightUtils::GetRadiance(light, closestHit.origin);
+			BRDF = materials[closestHit.materialIndex]->Shade(closestHit, lightDirection, -rayDirection);
 
-
-
+			
 
 			switch (m_CurrentLightingMode)
 			{

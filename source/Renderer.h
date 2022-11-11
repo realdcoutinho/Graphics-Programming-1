@@ -12,9 +12,9 @@ namespace dae
 {
 
 	class Scene;
-	class Camera;
+	struct Camera;
 	class Material;
-	class Light;
+	struct Light;
 
 	class Renderer final
 	{
