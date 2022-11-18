@@ -22,6 +22,7 @@ namespace dae
 		Vector3 origin{};
 		float fovAngle{90.f};
 		float fov{ tanf((fovAngle * TO_RADIANS) / 2.f) };
+		//float fov{};
 		const float cameraVelocity{ 5.f };
 
 		Vector3 worldUp{ Vector3::UnitY };
