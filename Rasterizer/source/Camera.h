@@ -5,6 +5,7 @@
 
 #include "Math.h"
 #include "Timer.h"
+#include <iostream>
 
 namespace dae
 {
@@ -19,29 +20,37 @@ namespace dae
 		}
 
 
-		Vector3 origin{};
-		float fovAngle{90.f};
-		float fov{ tanf((fovAngle * TO_RADIANS) / 2.f) };
-		//float fov{};
-		const float cameraVelocity{ 5.f };
+		Vector3 origin				{};
+		float fovAngle				{90.f};
+		float fov					{ tanf((fovAngle * TO_RADIANS) / 2.f) };
+		const float cameraVelocity	{ 15.f };
 
-		Vector3 worldUp{ Vector3::UnitY };
-		Vector3 forward{Vector3::UnitZ};
-		Vector3 up{Vector3::UnitY};
-		Vector3 right{Vector3::UnitX};
+		Vector3 worldUp	{ Vector3::UnitY };
+		Vector3 forward	{Vector3::UnitZ};
+		Vector3 up		{Vector3::UnitY};
+		Vector3 right	{Vector3::UnitX};
 
-		float totalPitch{};
-		float totalYaw{};
+		float totalPitch	{};
+		float totalYaw		{};
 
-		Matrix invViewMatrix{};
-		Matrix viewMatrix{};
+		float nearPlane		{ 0.1f };
+		float farPlane		{ 100.0f };
 
-		void Initialize(float _fovAngle = 90.f, Vector3 _origin = {0.f,0.f,0.f})
+		Matrix invViewMatrix				{};
+		Matrix viewMatrix					{};
+		Matrix projectionMatrix				{};
+		Matrix worldViewProjectionMatrix	{};
+
+		float aspectRatio{};
+
+		void Initialize(float aspectRatioRender, float _fovAngle = 90.f, Vector3 _origin = { 0.f,0.f,0.f })
 		{
 			fovAngle = _fovAngle;
 			fov = tanf((fovAngle * TO_RADIANS) / 2.f);
 
 			origin = _origin;
+
+			aspectRatio = aspectRatioRender;
 		}
 
 		void CalculateViewMatrix()
@@ -75,8 +84,21 @@ namespace dae
 		{
 			//TODO W2
 
+			Vector4 line1{ (1 / (aspectRatio * fov)), 0, 0, 0 };
+			Vector4 line2{ 0, (1 / fov), 0, 0 };
+			Vector4 line3{ 0, 0, (farPlane / (farPlane - nearPlane)), 1 };
+			Vector4 line4{ 0, 0, -1 * ((farPlane * nearPlane) / (farPlane - nearPlane)), 0 };
+			Matrix ProjectionMatrix{ line1, line2, line3, line4 };
+			projectionMatrix = ProjectionMatrix;
+
 			//ProjectionMatrix => Matrix::CreatePerspectiveFovLH(...) [not implemented yet]
 			//DirectX Implementation => https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dxmatrixperspectivefovlh
+		}
+
+		void CalculateWorldViewProjectionMatrix()
+		{
+			Matrix final = viewMatrix * projectionMatrix;
+			worldViewProjectionMatrix = final;
 		}
 
 		void Update(Timer* pTimer)
@@ -92,6 +114,8 @@ namespace dae
 			//Update Matrices
 			CalculateViewMatrix();
 			CalculateProjectionMatrix(); //Try to optimize this - should only be called once or when fov/aspectRatio changes
+			CalculateWorldViewProjectionMatrix();
+
 		}
 
 		void KeyboardInput(float deltaTime)
@@ -105,7 +129,6 @@ namespace dae
 				origin += right * cameraVelocity * deltaTime * pKeyboardState[SDL_SCANCODE_D];
 				origin += right * cameraVelocity * -deltaTime * pKeyboardState[SDL_SCANCODE_A];
 			}
-
 		}
 
 		void MouseInput(float deltaTime)

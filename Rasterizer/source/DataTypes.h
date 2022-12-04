@@ -8,20 +8,20 @@ namespace dae
 	{
 		Vector3 position{};
 		ColorRGB color{colors::White};
-		//Vector2 uv{}; //W3
-		//Vector3 normal{}; //W4
-		//Vector3 tangent{}; //W4
-		//Vector3 viewDirection{}; //W4
+		Vector2 uv{}; //W3
+		Vector3 normal{}; //W4
+		Vector3 tangent{}; //W4
+		Vector3 viewDirection{}; //W4
 	};
 
 	struct Vertex_Out
 	{
 		Vector4 position{};
 		ColorRGB color{ colors::White };
-		//Vector2 uv{};
-		//Vector3 normal{};
-		//Vector3 tangent{};
-		//Vector3 viewDirection{};
+		Vector2 uv{};
+		Vector3 normal{};
+		Vector3 tangent{};
+		Vector3 viewDirection{};
 	};
 
 	enum class PrimitiveTopology
@@ -39,6 +39,9 @@ namespace dae
 		std::vector<Vertex_Out> vertices_out{};
 		Matrix worldMatrix{};
 	};
+
+
+
 
 	struct Triangle
 	{
@@ -76,14 +79,6 @@ namespace dae
 
 		void TransformToScreenSpace(float width, float height)
 		{
-			//for (const auto& pos : positions)
-			//{
-			//	float SPVX = (pos.x + 1) / 2 * width;
-			//	float SPVY = (1 - pos.y) / 2 * height;
-			//	Vector3 newNDCposition{ SPVX, SPVY, 0 };
-			//	positionsNDC.push_back(newNDCposition);
-			//}
-			
 			for (auto& pos : positions)
 			{
 				pos.x = (pos.x + 1) / 2 * width;
@@ -94,17 +89,6 @@ namespace dae
 			v1 = positions[1];
 			v2 = positions[2];
 		}
-
-		//void TransformToCameraSpace(const Matrix& matrix)
-		//{
-		//	for (const auto& pos : positions)
-		//	{
-		//		positionsCameraSpace.emplace_back(matrix.TransformPoint(pos));
-		//	}
-		//	v0 = positionsCameraSpace[0];
-		//	v1 = positionsCameraSpace[1];
-		//	v2 = positionsCameraSpace[2];
-		//}
 
 		void TransformToProjectedStage()
 		{
@@ -121,10 +105,25 @@ namespace dae
 			v1 = positionsProjectionStage[1];
 			v2 = positionsProjectionStage[2];
 
-
-
-
 		}
-
 	};
+
+#pragma region LIGHT
+	enum class LightType
+	{
+		Point,
+		Directional
+	};
+
+	struct Light
+	{
+		Vector3 origin{};
+		Vector3 direction{};
+		ColorRGB color{};
+		float intensity{};
+		float shininess;
+
+		LightType type{};
+	};
+#pragma endregion
 }
