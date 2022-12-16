@@ -121,7 +121,9 @@ namespace dae
 		Vector3 direction{};
 		ColorRGB color{};
 		float intensity{};
-		float shininess;
+		float shininess{};
+		ColorRGB ambient{};
+
 
 		LightType type{};
 	};

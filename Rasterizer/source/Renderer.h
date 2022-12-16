@@ -50,9 +50,9 @@ namespace dae
 
 		void ToggleDepthBuffer();
 		void ToggleRotation();
-		void ToggleNormalMap();
 		void ToggleShadingMode();
-
+		void ToggleNormalMap() { m_IsNormalMapOn = !m_IsNormalMapOn; };
+		void ToggleParallelFor() { m_IsParallelOn = !m_IsParallelOn; };
 
 
 	private:
@@ -110,8 +110,10 @@ namespace dae
 		int m_Height{};
 		float m_AspectRatio{};
 		float m_yawn{};
+		float m_RotationSpeed{};
 
-		Vector3 m_LightDirection{ 0.577f, -0.577f, 0.577f };
+		bool m_IsNormalMapOn{ true };
+		bool m_IsParallelOn{ true };
 
 		//Function that transforms the vertices from the mesh from World space to Screen space
 		void VertexTransformationFunction(std::vector<Mesh>& mesh) const; //W4 Version
@@ -123,7 +125,7 @@ namespace dae
 		void InitializeVehicle();
 
 		//its not const on purpose
-		void PixelShading(Vertex_Out& v) const;
+		ColorRGB PixelShading(const Vertex_Out& v) const;
 
 
 		//Renderes the Triangle

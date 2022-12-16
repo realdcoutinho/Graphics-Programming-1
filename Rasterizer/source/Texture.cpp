@@ -42,10 +42,10 @@ namespace dae
 	ColorRGB Texture::Sample(const Vector2& uv) const
 	{ 
 		SDL_Color rgb{};
-		//if (uv.x > 1 || uv.x < -1)
-		//	return {};
-		//if (uv.y > 1 || uv.y < -1)
-		//	return {};
+		if (uv.x > 1 || uv.x < -1)
+			return {};
+		if (uv.y > 1 || uv.y < -1)
+			return {};
 
 		//Vector2 uvNormalized = uv.Normalized();
 		Uint32 u = uv.x * m_pSurface->w;

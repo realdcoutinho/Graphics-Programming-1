@@ -51,6 +51,7 @@ namespace dae
 			origin = _origin;
 
 			aspectRatio = aspectRatioRender;
+			CalculateProjectionMatrix(); //Try to optimize this - should only be called once or when fov/aspectRatio changes
 		}
 
 		void CalculateViewMatrix()
@@ -84,11 +85,11 @@ namespace dae
 		{
 			//TODO W2
 
-			Vector4 line1{ (1 / (aspectRatio * fov)), 0, 0, 0 };
-			Vector4 line2{ 0, (1 / fov), 0, 0 };
-			Vector4 line3{ 0, 0, (farPlane / (farPlane - nearPlane)), 1 };
-			Vector4 line4{ 0, 0, -1 * ((farPlane * nearPlane) / (farPlane - nearPlane)), 0 };
-			Matrix ProjectionMatrix{ line1, line2, line3, line4 };
+			const Vector4 line1{ (1 / (aspectRatio * fov)), 0, 0, 0 };
+			const Vector4 line2{ 0, (1 / fov), 0, 0 };
+			const Vector4 line3{ 0, 0, (farPlane / (farPlane - nearPlane)), 1 };
+			const Vector4 line4{ 0, 0, -1 * ((farPlane * nearPlane) / (farPlane - nearPlane)), 0 };
+			const Matrix ProjectionMatrix{ line1, line2, line3, line4 };
 			projectionMatrix = ProjectionMatrix;
 
 			//ProjectionMatrix => Matrix::CreatePerspectiveFovLH(...) [not implemented yet]
@@ -97,7 +98,7 @@ namespace dae
 
 		void CalculateWorldViewProjectionMatrix()
 		{
-			Matrix final = viewMatrix * projectionMatrix;
+			const Matrix final = viewMatrix * projectionMatrix;
 			worldViewProjectionMatrix = final;
 		}
 
@@ -113,7 +114,6 @@ namespace dae
 
 			//Update Matrices
 			CalculateViewMatrix();
-			CalculateProjectionMatrix(); //Try to optimize this - should only be called once or when fov/aspectRatio changes
 			CalculateWorldViewProjectionMatrix();
 
 		}

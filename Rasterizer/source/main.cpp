@@ -71,6 +71,8 @@ int main(int argc, char* args[])
 					pRenderer->ToggleNormalMap();
 				if (e.key.keysym.scancode == SDL_SCANCODE_F7)
 					pRenderer->ToggleShadingMode();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F8)
+					pRenderer->ToggleParallelFor();
 				break;
 			}
 		}

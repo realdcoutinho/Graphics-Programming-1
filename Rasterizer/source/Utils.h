@@ -245,7 +245,7 @@ namespace dae
 
 		void CalculateAABB(const std::vector<Vertex_Out>& vertices, Vector3& minAABB, Vector3& maxAABB, const int maxWidth, const int maxHeight)
 		{
-			float offset{ 1.0f }; //removes the black lines between each triangle // however not between triangles vertically, only those horizontally next to eahc other
+			const float offset{ 1.0f }; //removes the black lines between each triangle // however not between triangles vertically, only those horizontally next to eahc other
 
 			minAABB = vertices[0].position;
 			maxAABB = vertices[0].position;
@@ -254,25 +254,25 @@ namespace dae
 			{
 				//get min
 				if (pos.position.x < minAABB.x)
-					minAABB.x = pos.position.x - offset;
+					minAABB.x = pos.position.x;
 				if (pos.position.y < minAABB.y)
-					minAABB.y = pos.position.y - offset;
+					minAABB.y = pos.position.y;
 				//if (pos.position.z < minAABB.z)
 				//	minAABB.z = pos.position.z - offset;
 
 				//get max
 				if (pos.position.x > maxAABB.x)
-					maxAABB.x = pos.position.x + offset;
+					maxAABB.x = pos.position.x;
 				if (pos.position.y > maxAABB.y)
-					maxAABB.y = pos.position.y + offset;
+					maxAABB.y = pos.position.y;
 				//if (pos.position.z > maxAABB.z)
 				//	maxAABB.z = pos.position.z + offset;
 			}
 
-			minAABB.x = Clamp(minAABB.x, 0.0f, static_cast<float>(maxWidth));
-			minAABB.y = Clamp(minAABB.y, 0.0f, static_cast<float>(maxHeight));
-			maxAABB.x = Clamp(maxAABB.x, 0.0f, static_cast<float>(maxWidth));
-			maxAABB.y = Clamp(maxAABB.y, 0.0f, static_cast<float>(maxHeight));
+			minAABB.x = Clamp(minAABB.x, 0.0f, static_cast<float>(maxWidth )) - offset;
+			minAABB.y = Clamp(minAABB.y, 0.0f, static_cast<float>(maxHeight )) - offset;
+			maxAABB.x = Clamp(maxAABB.x, 0.0f, static_cast<float>(maxWidth )) + offset;
+			maxAABB.y = Clamp(maxAABB.y, 0.0f, static_cast<float>(maxHeight )) + offset;
 		}
 
 		float CalculateArea(const Vector2& v0, const Vector2& v1, const Vector2& v2)
@@ -287,22 +287,22 @@ namespace dae
 
 		float CalculateInterpolatedZ(const std::vector<Vertex_Out>& triangle, const float w0, const float w1, const float w2)
 		{
-			float part1 = (1.0f / triangle[0].position.z) * w0;
-			float part2 = (1.0f / triangle[1].position.z) * w1;
-			float part3 = (1.0f / triangle[2].position.z) * w2;
+			const float part1 = (1.0f / triangle[0].position.z) * w0;
+			const float part2 = (1.0f / triangle[1].position.z) * w1;
+			const float part3 = (1.0f / triangle[2].position.z) * w2;
 
-			float total = part1 + part2 + part3;
+			const float total = part1 + part2 + part3;
 
 			return (1 / total); // z interpolated;
 		}
 
 		float CalculateInterpolatedW(const std::vector<Vertex_Out>& triangle, const float w0, const float w1, const float w2)
 		{
-			float part1 = (1.0f / triangle[0].position.w) * w0;
-			float part2 = (1.0f / triangle[1].position.w) * w1;
-			float part3 = (1.0f / triangle[2].position.w) * w2;
+			const float part1 = (1.0f / triangle[0].position.w) * w0;
+			const float part2 = (1.0f / triangle[1].position.w) * w1;
+			const float part3 = (1.0f / triangle[2].position.w) * w2;
 
-			float total = part1 + part2 + part3;
+			const float total = part1 + part2 + part3;
 
 			return (1 / total); // w interpolated;
 		}
@@ -341,19 +341,18 @@ namespace dae
 			const Vector3 interpolatedNormal{ Utils::CalculateInterpolatedNormal(triangle, w0, w1,w2, interpolatedW) };
 			const Vector3 interpolatedTangent{ Utils::CalculateInterpolatedTangent(triangle, w0, w1,w2, interpolatedW) };
 			const Vector3 interpolatedViewDirection{ Utils::CalculateInterpolatedViewDirection(triangle, w0, w1,w2, interpolatedW) };
-			return Vertex_Out { interpolatedPixelPosition, {0, 0, 0}, interpolatedUV, interpolatedNormal, interpolatedTangent, interpolatedViewDirection };
+			return Vertex_Out { interpolatedPixelPosition, {0, 0, 0}, interpolatedUV, interpolatedNormal, interpolatedTangent, interpolatedViewDirection};
 		}
 
 
 		float Remap(float value)
 		{
-			float min = 0.99f; //value changed on purpose to fit the vehicle better // it used to be 0.985f
-			float max = 1.0f;
+			const float min = 0.985f; //value changed on purpose to fit the vehicle better // it used to be 0.985f
+			const float max = 1.0f;
 
-			float newValue = value - min;
+			const float newValue = value - min;
 
 			return newValue / (max - min);
-
 		}
 
 #pragma region noUse
@@ -408,13 +407,12 @@ namespace dae
 			return { kd * cd / PI };
 		}
 
-		ColorRGB Phong(float ks, float exp, const Vector3& lightVector, const Vector3& viewDirection, const Vector3& normal)
+		ColorRGB Phong(ColorRGB ks, float exp, const Vector3& lightVector, const Vector3& viewDirection, const Vector3& normal)
 		{
 			const Vector3 reflect{ lightVector - 2 * (Vector3::Dot(normal, lightVector)) * normal };
 			const float cosineAlpha{ std::max(0.0f, Vector3::Dot(reflect, viewDirection)) };
-			const float phongSpecularReflection{ ks * (powf(cosineAlpha, exp)) };
-			const ColorRGB Phong{ phongSpecularReflection , phongSpecularReflection , phongSpecularReflection };
-			return Phong;
+			const ColorRGB phongSpecularReflection{ ks * (powf(cosineAlpha, exp)) };
+			return phongSpecularReflection;
 		}
 
 		ColorRGB GetRadiance(const Light& light, const Vector3& target = { 0, 0, 0 })
@@ -435,7 +433,6 @@ namespace dae
 				const ColorRGB lightColor{ light .color};
 				return lightColor * intensity;
 			}
-			//return ColorRGB{};
 		}
 
 #pragma endregion shadingFunctions
@@ -455,7 +452,7 @@ namespace dae
 			return l;
 		}
 
-		Light AddDirectionalLight(const Vector3& direction, float intensity, const ColorRGB& color, const float shininess)
+		Light AddDirectionalLight(const Vector3& direction, float intensity, const ColorRGB& color, const float shininess, const ColorRGB& ambient = { 0, 0, 0 })
 		{
 			Light l;
 			l.direction = direction;
