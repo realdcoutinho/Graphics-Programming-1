@@ -177,6 +177,9 @@ void Renderer::RenderTriangleW4(Vertex_Out& v0, Vertex_Out& v1, Vertex_Out& v2)
 
 	float area{ CalculateArea(V0, V1, V2) };
 
+	if (area <= 0) // if area is negative, we are looking at the back of the triangle, hence, do not render
+		return;
+
 	ColorRGB finalColor{ colors::Black };
 
 	for (int px{ static_cast<int>(minAABB.x) }; px < static_cast<int>(maxAABB.x); ++px)
