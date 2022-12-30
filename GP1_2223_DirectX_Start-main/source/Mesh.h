@@ -8,7 +8,7 @@ namespace dae
 	class Mesh final
 	{
 	public:
-		Mesh(ID3D11Device* pDevice, std::vector<Vertex_PosCol> vertices, std::vector<uint32_t> indices);
+		Mesh(ID3D11Device* pDevice, const std::string& vehicle);
 		~Mesh();
 
 		Mesh(const Mesh&) = delete;
@@ -16,9 +16,18 @@ namespace dae
 		Mesh& operator=(const Mesh&) = delete;
 		Mesh& operator=(Mesh&&) noexcept = delete;
 
+
+		void Update(const Timer* pTimer, Camera *camera);
 		void Render(ID3D11DeviceContext* pDeviceContext) const;
+		void ToggleTextures() const;
+
+		void SetTextures(const std::string& diffuse, const std::string& normal, const std::string& specular, const std::string& gloss) const;
 
 	private:
+
+		float m_Yawn;
+		float m_RotationSpeed{ 1.0f };
+
 		Effect* m_pEffect;
 
 		ID3D11Device* m_pDevice;
@@ -30,6 +39,7 @@ namespace dae
 		ID3DX11EffectTechnique* m_pTechnique;
 		ID3D11Buffer* m_pVertexBuffer;
 		ID3D11Buffer* m_pIndexBuffer;
+
 
 
 	};

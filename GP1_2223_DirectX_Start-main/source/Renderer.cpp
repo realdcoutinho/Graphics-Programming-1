@@ -9,6 +9,11 @@ namespace dae {
 		//Initialize
 		SDL_GetWindowSize(pWindow, &m_Width, &m_Height);	
 
+		//Initialize Camera
+		float aspectRatio = static_cast<float>(m_Width) / static_cast<float>(m_Height);
+		m_Camera = new Camera({ 0.0f, 0.0f, -10.0f }, 45.0f);
+		m_Camera->Initialize(aspectRatio, 45.0f, { 0.0f, 0.0f, -50.0f });
+
 		//Initialize DirectX pipeline
 		const HRESULT result = InitializeDirectX();
 
@@ -22,26 +27,70 @@ namespace dae {
 			std::cout << "DirectX initialization failed!\n";
 		}
 
-		std::vector<Vertex_PosCol> vertices
-		{
-			{{0.0f, 0.5f, 0.5f}, {colors::Red}},
-			{{0.5f, -0.5f, 0.5f}, {colors::Blue}},
-			{{-0.5f, -0.5f, 0.5f}, {colors::Green}},
-		};
+		//std::vector<Vertex_PosCol> vertices
+		//{
+		//	{{0.0f, 0.5f, 0.5f}, {colors::Red}},
+		//	{{0.5f, -0.5f, 0.5f}, {colors::Blue}},
+		//	{{-0.5f, -0.5f, 0.5f}, {colors::Green}},
+		//};
+		//
+		//std::vector<uint32_t> indices{ 0,1,2 };
+		//
+		//m_pMesh = new Mesh(m_pDevice, vertices, indices);
 
-		std::vector<uint32_t> indices{ 0,1,2 };
+		//std::vector<Vertex_PosCol> vertices
+		//{
+		//	//{{0.0f, 3.0f,2.0f}, {colors::Red}},
+		//	//{{3.0f, -3.0f,2.0f}, {colors::Blue}},
+		//	//{{-3.0f, -3.0f, 2.0f}, {colors::Green}},
 
-		m_pMesh = new Mesh(m_pDevice, vertices, indices);
+		//	{{ -3.0f,  3.0f, 2.0f},{},{ 0.0f, 0.0f}},
+		//	{{  0.0f,  3.0f, 2.0f},{},{ 0.5f, 0.0f}},
+		//	{{  3.0f,  3.0f, 2.0f},{},{ 1.0f, 0.0f}},
+		//	{{ -3.0f,  0.0f, 2.0f},{},{ 0.0f, 0.5f}},
+		//	{{  0.0f,  0.0f, 2.0f},{},{ 0.5f, 0.5f}},
+		//	{{  3.0f,  0.0f, 2.0f},{},{ 1.0f, 0.5f}},
+		//	{{ -3.0f, -3.0f, 2.0f},{},{ 0.0f, 1.0f}},
+		//	{{  0.0f, -3.0f, 2.0f},{},{ 0.5f, 1.0f}},
+		//	{{  3.0f, -3.0f, 2.0f},{},{ 1.0f, 1.0f}},
+		//};
+
+
+		//std::vector<uint32_t> indices{
+		//		/*		0,1,2 */
+		//		3,0,1,   1,4,3,   4,1,2,
+		//		2,5,4,   6,3,4,   4,7,6,
+		//		7,4,5,   5,8,7,
+		//};
+		//m_pTexture = Texture::LoadFromFile(m_pDevice, "Resources/uv_grid_2.png");
+
+		InitializeVehicle();
+	}
+
+	void Renderer::InitializeVehicle()
+	{
+		////vehicle
+		const std::string vehiclePath{ "Resources/Vehicle.obj" };
+		const std::string diffusePath{ "Resources/vehicle_diffuse.png" };
+		const std::string normalPath{ "Resources/vehicle_normal.png" };
+		const std::string specularPath{ "Resources/vehicle_specular.png" };
+		const std::string glossPath{ "Resources/vehicle_gloss.png" };
+
+		m_pVehicleMesh = new Mesh(m_pDevice, vehiclePath);
+		m_pVehicleMesh->SetTextures(diffusePath, normalPath, specularPath, glossPath);
 	}
 
 	Renderer::~Renderer()
 	{
 		FixResourceLeaks();
+		delete m_Camera;
+		delete m_pVehicleMesh;
 	}
 
 	void Renderer::Update(const Timer* pTimer)
 	{
-
+		m_Camera->Update(pTimer->GetElapsed());
+		m_pVehicleMesh->Update(pTimer, m_Camera);
 	}
 
 
@@ -57,7 +106,10 @@ namespace dae {
 
 		//2. SET PIPELINE + INVOKE DRAWCALLS (= RENDER)
 		//...
-		m_pMesh->Render(m_pDeviceContext);
+
+		Matrix worldMatrix = Matrix::CreateTranslation({0.0f, 0.0f, 0.f});
+		Matrix invViewMatrix = m_Camera->GetInvViewMatrix();
+		m_pVehicleMesh->Render(m_pDeviceContext);
 		
 		//3. PRESENT BACKBUFFER (SWAP)
 		m_pSwapChain->Present(0, 0);
@@ -202,19 +254,12 @@ namespace dae {
 			m_pRenderTargetBuffer->Release();
 		if (m_pTargetRenderView)
 			m_pTargetRenderView->Release();
+
 	}
 
-
-
-	//void Renderer::Render_W1() const
-	//{
-
-	//	////1. Set Primative Topology
-	//	m_pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	//	//2. Set Input Layout
-	//	m_pDeviceContext->IASetInputLayout(m_pEffect)
-
-	//}
+	void Renderer::ToggleTextures() const
+	{
+		
+	}
 }
 

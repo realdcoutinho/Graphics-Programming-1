@@ -4,7 +4,6 @@
 struct SDL_Window;
 struct SDL_Surface;
 class Effect;
-//class Mesh;
 
 namespace dae
 {
@@ -21,19 +20,27 @@ namespace dae
 
 		void Update(const Timer* pTimer);
 		void Render() const;
+		void ToggleTextures() const;
 
 		//void Render_W1() const;
 
 	private:
+		void InitializeVehicle();
+		
 		SDL_Window* m_pWindow{};
+
 
 		int m_Width{};
 		int m_Height{};
 
 		bool m_IsInitialized{ false };
+		Matrix m_ViewMatrix;
+		Matrix m_ProjectionMatrix;
+		Matrix m_WorldViewMatrix;
+		 
 
-
-		Mesh* m_pMesh;
+		Mesh* m_pVehicleMesh;
+		Camera* m_Camera;
 
 		//DIRECTX
 		HRESULT InitializeDirectX();

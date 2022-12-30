@@ -356,8 +356,6 @@ ColorRGB Renderer::PixelShading(const Vertex_Out& v) const
 #pragma region normals
 
 	//calculate normals
-
-
 	float lambertCosine{ Vector3::Dot(v.normal, -m_Light.direction) }; //aka ObservedArea with no normal
 	if (lambertCosine < 0)
 		return { colors::Black };  // Skip if observedArea is negative
@@ -377,9 +375,7 @@ ColorRGB Renderer::PixelShading(const Vertex_Out& v) const
 			return { colors::Black };  // Skip if observedArea is negative
 	}
 
-		
-
-
+	
 	//Sample Texture Map
 	const ColorRGB sampleTextureMap{ m_pTexture->Sample(v.uv) };
 	const ColorRGB diffuse{ ColorRGB{ Utils::Lambert(m_Light.intensity, sampleTextureMap) } };
