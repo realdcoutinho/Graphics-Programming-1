@@ -1,14 +1,15 @@
 #pragma once
 #include <vector>
 #include "Effect.h"
-
+#include "EffectBase.h"
+#include "EffectVehicle.h"
 
 namespace dae
 {
 	class Mesh final
 	{
 	public:
-		Mesh(ID3D11Device* pDevice, const std::string& vehicle);
+		Mesh(ID3D11Device* pDevice, const std::string& vehicle, const std::wstring& shader);
 		~Mesh();
 
 		Mesh(const Mesh&) = delete;
@@ -21,14 +22,18 @@ namespace dae
 		void Render(ID3D11DeviceContext* pDeviceContext) const;
 		void ToggleTextures() const;
 
-		void SetTextures(const std::string& diffuse, const std::string& normal, const std::string& specular, const std::string& gloss) const;
+		void SetDiffuse(const std::string& diffuse);
+		void SetNormal(const std::string& normal);
+		void SetSpecular(const std::string& specular);
+		void SetGloss(const std::string& gloss);
 
 	private:
 
 		float m_Yawn;
 		float m_RotationSpeed{ 1.0f };
 
-		Effect* m_pEffect;
+		//Effect* m_pEffect;
+		EffectVehicle* m_pEffectVehicle;
 
 		ID3D11Device* m_pDevice;
 		//std::vector<Vertex_Input> m_Vertices;

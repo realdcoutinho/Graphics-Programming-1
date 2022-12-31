@@ -26,6 +26,7 @@ namespace dae
 
 	private:
 		void InitializeVehicle();
+		void InitializeFire();
 		
 		SDL_Window* m_pWindow{};
 
@@ -40,6 +41,7 @@ namespace dae
 		 
 
 		Mesh* m_pVehicleMesh;
+		Mesh* m_pFireMesh;
 		Camera* m_Camera;
 
 		//DIRECTX

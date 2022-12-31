@@ -7,14 +7,15 @@
 
 namespace dae
 {
-	Mesh::Mesh(ID3D11Device* pDevice, const std::string& vehicle) :
+	Mesh::Mesh(ID3D11Device* pDevice, const std::string& vehicle, const std::wstring& shader) :
 		m_pDevice{pDevice}
 	{
 		std::vector<Vertex_PosCol>		vertices{};
 		std::vector<uint32_t>	indices{};
 		ParseOBJ(vehicle, vertices, indices);
 
-		m_pEffect = new Effect(pDevice, L"Resources/PosCol3D.fx") ;
+		//m_pEffect = new Effect(pDevice, L"Resources/PosCol3D.fx") ;
+		m_pEffectVehicle = new EffectVehicle(pDevice, shader);
 		
 		//Create vertex buffer
 		D3D11_BUFFER_DESC bd = {};
@@ -46,12 +47,14 @@ namespace dae
 
 	Mesh::~Mesh()
 	{
-		delete m_pEffect;
+		//delete m_pEffect;
+		delete m_pEffectVehicle;
 	}
 
 	void Mesh::Update(const Timer* pTimer, Camera* camera)
 	{
-		m_pEffect->ToggleSamplerTechnique();
+		//m_pEffect->ToggleSamplerTechnique();
+		m_pEffectVehicle->ToggleSamplerTechnique();
 		m_Yawn += pTimer->GetElapsed() * m_RotationSpeed;
 		Matrix rotationMatrix = Matrix::CreateRotationY(m_Yawn);
 
@@ -59,17 +62,20 @@ namespace dae
 		//set the matrix for the PosCol3D
 		Matrix worldViewProjectionMatrix = rotationMatrix * camera->GetWorldViewProjectionMatrix();
 		float* arrayWorldViewMatrix = reinterpret_cast<float*>(&worldViewProjectionMatrix);
-		m_pEffect->GetMatWorldViewProjVariable()->SetMatrix(arrayWorldViewMatrix);
+		//m_pEffect->GetMatWorldViewProjVariable()->SetMatrix(arrayWorldViewMatrix);
+		m_pEffectVehicle->GetMatWorldViewProjVariable()->SetMatrix(arrayWorldViewMatrix);
 
 		//set the world  matrix for PosCol3D
 		Matrix worldMatrix = rotationMatrix * camera->GetViewMatrix();
 		float* arrayWorldMatrix = reinterpret_cast<float*>(&worldMatrix);
-		m_pEffect->GetMatWorldMatrixVariable()->SetMatrix(arrayWorldMatrix);
+		//m_pEffect->GetMatWorldMatrixVariable()->SetMatrix(arrayWorldMatrix);
+		m_pEffectVehicle->GetMatWorldMatrixVariable()->SetMatrix(arrayWorldMatrix);
 
 		//set the inverse view matrix
 		Matrix inverseViewMatrix = rotationMatrix * camera->GetInvViewMatrix();
 		float* arrayInverseViewMatrix = reinterpret_cast<float*>(&inverseViewMatrix);
-		m_pEffect->GetMatInvViewMatrixVariable()->SetMatrix(arrayInverseViewMatrix);
+		//m_pEffect->GetMatInvViewMatrixVariable()->SetMatrix(arrayInverseViewMatrix);
+		m_pEffectVehicle->GetMatInvViewMatrixVariable()->SetMatrix(arrayInverseViewMatrix);
 	}
 
 	void Mesh::Render(ID3D11DeviceContext* pDeviceContext) const
@@ -80,7 +86,8 @@ namespace dae
 
 
 		//2. Set Input Layout
-		pDeviceContext->IASetInputLayout(m_pEffect->GetInputLayout());
+		//pDeviceContext->IASetInputLayout(m_pEffect->GetInputLayout());
+		pDeviceContext->IASetInputLayout(m_pEffectVehicle->GetInputLayout());
 
 		//3. SetVertexBuffer
 		constexpr UINT stride = sizeof(Vertex_PosCol);
@@ -96,40 +103,47 @@ namespace dae
 		//5. Draw
 		//renderTriangle
 		D3DX11_TECHNIQUE_DESC techDesc{};
-		m_pEffect->GetTechniquePointer()->GetDesc(&techDesc);
+		//m_pEffect->GetTechniquePointer()->GetDesc(&techDesc);
+		m_pEffectVehicle->GetTechniquePointer()->GetDesc(&techDesc);
 		for (UINT p = 0; p < techDesc.Passes; ++p)
 		{
-			m_pEffect->GetTechniquePointer()->GetPassByIndex(p)->Apply(0, pDeviceContext);
+			//m_pEffect->GetTechniquePointer()->GetPassByIndex(p)->Apply(0, pDeviceContext);
+			m_pEffectVehicle->GetTechniquePointer()->GetPassByIndex(p)->Apply(0, pDeviceContext);
+
 			pDeviceContext->DrawIndexed(m_NumIndices, 0, 0);
 		}
 	}
 
-	void Mesh::SetTextures(const std::string& diffuse, const std::string& normal, const std::string& specular, const std::string& gloss) const
+	void Mesh::SetDiffuse(const std::string& diffuse)
 	{
-		if (diffuse.size() > 0)
-		{
-			Texture* diffuseMap = Texture::LoadFromFile(m_pDevice, diffuse);
-			m_pEffect->SetDiffuseMap(diffuseMap);
-			delete diffuseMap;
-		}
-		if (normal.size() > 0)
-		{
-			Texture* normalMap = Texture::LoadFromFile(m_pDevice, normal);
-			m_pEffect->SetNormalMap(normalMap);
-			delete normalMap;
-		}
-		if (specular.size() > 0)
-		{
-			Texture* specularMap = Texture::LoadFromFile(m_pDevice, specular);
-			m_pEffect->SetSpecularMap(specularMap);
-			delete specularMap;
-		}
-		if (gloss.size() > 0)
-		{
-			Texture* glossinessMap = Texture::LoadFromFile(m_pDevice, gloss);
-			m_pEffect->SetGlossinessMap(glossinessMap);
-			delete glossinessMap;
-		}
+		Texture* diffuseMap = Texture::LoadFromFile(m_pDevice, diffuse);
+		//m_pEffect->SetDiffuseMap(diffuseMap);
+		m_pEffectVehicle->SetDiffuseMap(diffuseMap);
+		delete diffuseMap;
+	}
+
+	void Mesh::SetNormal(const std::string& normal)
+	{
+		Texture* normalMap = Texture::LoadFromFile(m_pDevice, normal);
+		//m_pEffect->SetNormalMap(normalMap);
+		m_pEffectVehicle->SetNormalMap(normalMap);
+		delete normalMap;
+	}
+
+	void Mesh::SetSpecular(const std::string& specular)
+	{
+		Texture* specularMap = Texture::LoadFromFile(m_pDevice, specular);
+		//m_pEffect->SetSpecularMap(specularMap);
+		m_pEffectVehicle->SetSpecularMap(specularMap);
+		delete specularMap;
+	}
+
+	void Mesh::SetGloss(const std::string& gloss)
+	{
+		Texture* glossinessMap = Texture::LoadFromFile(m_pDevice, gloss);
+		//m_pEffect->SetGlossinessMap(glossinessMap);
+		m_pEffectVehicle->SetGlossinessMap(glossinessMap);
+		delete glossinessMap;
 	}
 
 	void Mesh::ToggleTextures() const

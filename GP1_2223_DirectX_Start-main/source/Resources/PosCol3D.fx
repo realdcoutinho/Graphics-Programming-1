@@ -23,6 +23,47 @@ float3 Ambient = float3(0.025f, 0.025f, 0.025f);
 //Maths
 float PI = float(3.14159265f);
 
+RasterizerState gRasterizerState
+{
+	CullMode = back;
+	FrontCounterClockWise = true; // default
+};
+
+BlendState gBlendState
+{
+	BlendEnable[0] = true;
+	SrcBlend = src_alpha;
+	DestBlend = inv_src_alpha;
+	BlendOp = add;
+	SrcBlendAlpha = zero;
+	DestBlendAlpha = zero;
+	BlendOpAlpha = add;
+	RenderTargetWriteMask[0] = 0x0F;
+};
+
+DepthStencilState gDepthStencilState
+{
+	DepthEnable = true;
+	DepthWriteMask = true;
+	DepthFunc = less;
+	StencilEnable = false;
+
+	StencilReadMask = 0x0F;
+	StencilWriteMask = 0x0F;
+
+	FrontFaceStencilFunc = always;
+	BackFaceStencilFunc = always;
+
+	FrontFaceStencilDepthFail = keep;
+	BackFaceStencilDepthFail = keep;
+
+	FrontFaceStencilPass = keep;
+	BackFaceStencilPass = keep;
+
+	FrontFaceStencilFail = keep;
+	BackFaceStencilFail = keep;
+};
+
 
 struct Light
 {
@@ -188,6 +229,9 @@ float4 PS_Point(VS_OUTPUT input) : SV_TARGET //change name in PS.
 
 	float3 phong = Phong(sampleSpecularMap, phongExponent, -gLightDirection, -viewDirection, input.Normal);
 
+	
+	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+
 	//combined
 	return float4((Ambient + diffuse + phong) * observedArea, 1.0f);
 	//observed area
@@ -202,6 +246,7 @@ float4 PS_Point(VS_OUTPUT input) : SV_TARGET //change name in PS.
 //MAIN!!!
 float4 PS_Linear(VS_OUTPUT input) : SV_TARGET //change name PS.
 {
+
 	//calculate observed Area
 	float observedArea = dot(input.Normal, -gLightDirection);
 	if (observedArea < 0)
@@ -240,12 +285,14 @@ float4 PS_Linear(VS_OUTPUT input) : SV_TARGET //change name PS.
 
 	float3 phong = Phong(sampleSpecularMap, phongExponent, -gLightDirection, -viewDirection, input.Normal);
 	
+	//return float4(1.0f, 1.0f, 1.0f, 1.0f);
+
 	//combined
 	return float4((Ambient + diffuse + phong) * observedArea, 1.0f);
 	//observed area
 	return float4(observedArea, observedArea, observedArea, 1.0f);
 	//diffuse
-	return float4(diffuse * observedArea, 1.0f);
+	return float4(diffuse , 1.0f);
 	//Specular
 	return float4(phong * observedArea, 1.0f);
 }
@@ -312,6 +359,7 @@ technique11 DefaultTechnique
 {
 	pass p0
 	{
+		SetRasterizerState(gRasterizerState);
 		SetVertexShader(CompileShader(vs_5_0, VS()));
 		SetGeometryShader(NULL);
 		SetPixelShader(CompileShader(ps_5_0, PS()));
@@ -322,6 +370,7 @@ technique11 TechniquePoint
 {
 	pass p0
 	{
+		SetRasterizerState(gRasterizerState);
 		SetVertexShader(CompileShader(vs_5_0, VS()));
 		SetGeometryShader(NULL);
 		SetPixelShader(CompileShader(ps_5_0, PS_Point()));
@@ -332,6 +381,9 @@ technique11 TechniqueLinear
 {
 	pass p0
 	{
+		SetRasterizerState(gRasterizerState);
+		SetDepthStencilState(gDepthStencilState, 0);
+		SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
 		SetVertexShader(CompileShader(vs_5_0, VS()));
 		SetGeometryShader(NULL);
 		SetPixelShader(CompileShader(ps_5_0, PS_Linear()));
@@ -342,6 +394,7 @@ technique11 TechniqueAnsotropic
 {
 	pass p0
 	{
+		SetRasterizerState(gRasterizerState);
 		SetVertexShader(CompileShader(vs_5_0, VS()));
 		SetGeometryShader(NULL);
 		SetPixelShader(CompileShader(ps_5_0, PS_Anisotropic()));

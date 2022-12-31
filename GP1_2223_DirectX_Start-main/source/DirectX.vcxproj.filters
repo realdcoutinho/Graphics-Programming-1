@@ -8,6 +8,9 @@
     <Filter Include="Misc">
       <UniqueIdentifier>{72056cb6-72a2-42b7-b05e-376f1ddd957e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math\Effect">
+      <UniqueIdentifier>{1ba3b94a-221c-4998-b509-5afc5d4ef1c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Renderer.h" />
@@ -36,9 +39,6 @@
     <ClInclude Include="ColorRGB.h">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="Effect.h">
-      <Filter>Math</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="DataTypes.h" />
     <ClInclude Include="Mesh.h">
@@ -46,6 +46,18 @@
     </ClInclude>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Effect.h">
+      <Filter>Math\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="EffectVehicle.h">
+      <Filter>Math\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="FireEffect.h">
+      <Filter>Math\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="EffectBase.h">
+      <Filter>Math\Effect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -66,9 +78,6 @@
       <Filter>Math</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="Effect.cpp">
-      <Filter>Math</Filter>
-    </ClCompile>
     <ClCompile Include="Mesh.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -77,6 +86,18 @@
     </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Effect.cpp">
+      <Filter>Math\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="EffectBase.cpp">
+      <Filter>Math\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="EffectVehicle.cpp">
+      <Filter>Math\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="FireEffect.cpp">
+      <Filter>Math\Effect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

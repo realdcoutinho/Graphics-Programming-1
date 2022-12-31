@@ -65,19 +65,35 @@ namespace dae {
 		//m_pTexture = Texture::LoadFromFile(m_pDevice, "Resources/uv_grid_2.png");
 
 		InitializeVehicle();
+		InitializeFire();
 	}
 
 	void Renderer::InitializeVehicle()
 	{
 		////vehicle
 		const std::string vehiclePath{ "Resources/Vehicle.obj" };
+		const std::wstring shaderPath{ L"Resources/PosCol3D.fx" };
 		const std::string diffusePath{ "Resources/vehicle_diffuse.png" };
 		const std::string normalPath{ "Resources/vehicle_normal.png" };
 		const std::string specularPath{ "Resources/vehicle_specular.png" };
 		const std::string glossPath{ "Resources/vehicle_gloss.png" };
 
-		m_pVehicleMesh = new Mesh(m_pDevice, vehiclePath);
-		m_pVehicleMesh->SetTextures(diffusePath, normalPath, specularPath, glossPath);
+		m_pVehicleMesh = new Mesh(m_pDevice, vehiclePath, shaderPath);
+		m_pVehicleMesh->SetDiffuse(diffusePath);
+		m_pVehicleMesh->SetNormal(normalPath);
+		m_pVehicleMesh->SetSpecular(specularPath);
+		m_pVehicleMesh->SetGloss(glossPath);
+	}
+
+	void Renderer::InitializeFire()
+	{
+		const std::string firePath{ "Resources/fireFX.obj" };
+		const std::wstring shaderPath{ L"Resources/FireShafing.fx" };
+		const std::string diffusePath{ "Resources/fireFX_diffuse.png" };
+
+		m_pFireMesh = new Mesh(m_pDevice, firePath, shaderPath);
+		m_pFireMesh->SetDiffuse(diffusePath);
+
 	}
 
 	Renderer::~Renderer()
@@ -85,12 +101,14 @@ namespace dae {
 		FixResourceLeaks();
 		delete m_Camera;
 		delete m_pVehicleMesh;
+		delete m_pFireMesh;
 	}
 
 	void Renderer::Update(const Timer* pTimer)
 	{
 		m_Camera->Update(pTimer->GetElapsed());
 		m_pVehicleMesh->Update(pTimer, m_Camera);
+		m_pFireMesh->Update(pTimer, m_Camera);
 	}
 
 
@@ -110,6 +128,7 @@ namespace dae {
 		Matrix worldMatrix = Matrix::CreateTranslation({0.0f, 0.0f, 0.f});
 		Matrix invViewMatrix = m_Camera->GetInvViewMatrix();
 		m_pVehicleMesh->Render(m_pDeviceContext);
+		m_pFireMesh->Render(m_pDeviceContext);
 		
 		//3. PRESENT BACKBUFFER (SWAP)
 		m_pSwapChain->Present(0, 0);
