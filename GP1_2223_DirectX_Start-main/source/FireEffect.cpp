@@ -13,11 +13,6 @@ namespace dae
 	FireEffect::~FireEffect()
 	{
 		std::wcout << L"FireEffect Deleted" << '\n';
-
-		if (m_pDevice)
-			m_pDevice->Release();
-		if (m_pEffect)
-			m_pEffect->Release();
 	}
 
 	void FireEffect::SetShaderResources()

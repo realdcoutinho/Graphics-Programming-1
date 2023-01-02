@@ -39,6 +39,7 @@ namespace dae
 
 		ID3D11Device* m_pDevice;
 		ID3DX11Effect* m_pEffect{};
+
 		ID3DX11EffectTechnique* m_pTechnique{};
 		ID3D11InputLayout* m_pInputLayout;
 		ID3DX11EffectMatrixVariable* m_pMatWorldViewProjVariable; //WORLD VIEW PROJECTION MATRIX 

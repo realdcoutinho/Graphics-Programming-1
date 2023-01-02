@@ -229,9 +229,6 @@ float4 PS_Point(VS_OUTPUT input) : SV_TARGET //change name in PS.
 
 	float3 phong = Phong(sampleSpecularMap, phongExponent, -gLightDirection, -viewDirection, input.Normal);
 
-	
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
-
 	//combined
 	return float4((Ambient + diffuse + phong) * observedArea, 1.0f);
 	//observed area
@@ -355,22 +352,14 @@ float4 PS_Anisotropic(VS_OUTPUT input) : SV_TARGET //change name PS.
 //--------------------------------
 // Technique
 //--------------------------------
-technique11 DefaultTechnique
-{
-	pass p0
-	{
-		SetRasterizerState(gRasterizerState);
-		SetVertexShader(CompileShader(vs_5_0, VS()));
-		SetGeometryShader(NULL);
-		SetPixelShader(CompileShader(ps_5_0, PS()));
-	}
-}
 
 technique11 TechniquePoint
 {
 	pass p0
 	{
 		SetRasterizerState(gRasterizerState);
+		SetDepthStencilState(gDepthStencilState, 0);
+		SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
 		SetVertexShader(CompileShader(vs_5_0, VS()));
 		SetGeometryShader(NULL);
 		SetPixelShader(CompileShader(ps_5_0, PS_Point()));
@@ -395,6 +384,8 @@ technique11 TechniqueAnsotropic
 	pass p0
 	{
 		SetRasterizerState(gRasterizerState);
+		SetDepthStencilState(gDepthStencilState, 0);
+		SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
 		SetVertexShader(CompileShader(vs_5_0, VS()));
 		SetGeometryShader(NULL);
 		SetPixelShader(CompileShader(ps_5_0, PS_Anisotropic()));

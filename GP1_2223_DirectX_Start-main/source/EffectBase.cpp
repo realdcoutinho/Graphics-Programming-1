@@ -10,7 +10,7 @@ namespace dae
 		std::wcout << L"BaseEffect Created" << '\n';
 
 		m_pEffect = LoadEffect(m_pDevice, m_AssetFile);
-		m_pTechnique = m_pEffect->GetTechniqueByName("DefaultTechnique");
+		m_pTechnique = m_pEffect->GetTechniqueByName("TechniquePoint");
 		if (!m_pTechnique->IsValid())
 		{
 			std::wcout << L"Technique is not valid" << '\n';
@@ -34,9 +34,6 @@ namespace dae
 		{
 			std::wcout << L"m_pMatInverseViewMatrixVariable not valid" << '\n';
 		}
-
-
-
 
 		m_pEffectSamplerVariable = m_pEffect->GetVariableByName("MeshTextureSampler")->AsSampler();
 		if (!m_pEffectSamplerVariable->IsValid())
@@ -117,6 +114,15 @@ namespace dae
 	{
 		std::wcout << L"EffectBase Deleted" << '\n';
 
+		if (m_pDevice)
+			m_pDevice->Release();
+		if (m_pEffect)
+			m_pEffect->Release();
+		if (m_pInputLayout)
+			m_pInputLayout->Release();
+		//if (m_pEffectSamplerVariable)
+		//	m_pEffectSamplerVariable->Release();
+		//why are some resoures not released
 	}
 
 	ID3DX11Effect* EffectBase::GetEffectPointer() const
@@ -151,9 +157,10 @@ namespace dae
 
 	void EffectBase::ToggleSamplerTechnique()
 	{
-		const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
-		if (pKeyboardState[SDL_SCANCODE_F2])
-		{
+		//const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
+		//auto keyState = pKeyboardState[SDL_SCANCODE_F2];
+		//if (keyState)
+		//{
 			switch (m_SamplerTechnique) {
 			case samplerTechnique::Point:
 				m_SamplerTechnique = samplerTechnique::Linear;
@@ -186,7 +193,7 @@ namespace dae
 				std::wcout << L"Technique is Ansotropic" << '\n';
 				break;
 			}
-		}
+		//}
 	}
 
 

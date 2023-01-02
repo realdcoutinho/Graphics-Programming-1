@@ -14,10 +14,6 @@ namespace dae
 	{
 		std::wcout << L"EffectVehicle Deleted" << '\n';
 
-		if (m_pDevice)
-			m_pDevice->Release();
-		if (m_pEffect)
-			m_pEffect->Release();
 	}
 
 	void EffectVehicle::SetShaderResources()

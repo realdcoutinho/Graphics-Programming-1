@@ -15,7 +15,7 @@ namespace dae
 		ParseOBJ(vehicle, vertices, indices);
 
 		//m_pEffect = new Effect(pDevice, L"Resources/PosCol3D.fx") ;
-		m_pEffectVehicle = new EffectVehicle(pDevice, shader);
+		m_pEffect = new EffectVehicle(pDevice, shader);
 		
 		//Create vertex buffer
 		D3D11_BUFFER_DESC bd = {};
@@ -48,14 +48,18 @@ namespace dae
 	Mesh::~Mesh()
 	{
 		//delete m_pEffect;
-		delete m_pEffectVehicle;
+		delete m_pEffect;
 	}
 
-	void Mesh::Update(const Timer* pTimer, Camera* camera)
+	void Mesh::Update(const Timer* pTimer, Camera* camera, bool isRotating, bool isToggling)
 	{
 		//m_pEffect->ToggleSamplerTechnique();
-		m_pEffectVehicle->ToggleSamplerTechnique();
-		m_Yawn += pTimer->GetElapsed() * m_RotationSpeed;
+		if(isToggling)
+			m_pEffect->ToggleSamplerTechnique();
+		if(isRotating)
+			m_Yawn += pTimer->GetElapsed() * m_RotationSpeed;
+
+		//m_Yawn += pTimer->GetElapsed() * m_RotationSpeed * !(m_pKeyboardState[SDL_SCANCODE_F5]);
 		Matrix rotationMatrix = Matrix::CreateRotationY(m_Yawn);
 
 
@@ -63,19 +67,19 @@ namespace dae
 		Matrix worldViewProjectionMatrix = rotationMatrix * camera->GetWorldViewProjectionMatrix();
 		float* arrayWorldViewMatrix = reinterpret_cast<float*>(&worldViewProjectionMatrix);
 		//m_pEffect->GetMatWorldViewProjVariable()->SetMatrix(arrayWorldViewMatrix);
-		m_pEffectVehicle->GetMatWorldViewProjVariable()->SetMatrix(arrayWorldViewMatrix);
+		m_pEffect->GetMatWorldViewProjVariable()->SetMatrix(arrayWorldViewMatrix);
 
 		//set the world  matrix for PosCol3D
 		Matrix worldMatrix = rotationMatrix * camera->GetViewMatrix();
 		float* arrayWorldMatrix = reinterpret_cast<float*>(&worldMatrix);
 		//m_pEffect->GetMatWorldMatrixVariable()->SetMatrix(arrayWorldMatrix);
-		m_pEffectVehicle->GetMatWorldMatrixVariable()->SetMatrix(arrayWorldMatrix);
+		m_pEffect->GetMatWorldMatrixVariable()->SetMatrix(arrayWorldMatrix);
 
 		//set the inverse view matrix
 		Matrix inverseViewMatrix = rotationMatrix * camera->GetInvViewMatrix();
 		float* arrayInverseViewMatrix = reinterpret_cast<float*>(&inverseViewMatrix);
 		//m_pEffect->GetMatInvViewMatrixVariable()->SetMatrix(arrayInverseViewMatrix);
-		m_pEffectVehicle->GetMatInvViewMatrixVariable()->SetMatrix(arrayInverseViewMatrix);
+		m_pEffect->GetMatInvViewMatrixVariable()->SetMatrix(arrayInverseViewMatrix);
 	}
 
 	void Mesh::Render(ID3D11DeviceContext* pDeviceContext) const
@@ -87,7 +91,7 @@ namespace dae
 
 		//2. Set Input Layout
 		//pDeviceContext->IASetInputLayout(m_pEffect->GetInputLayout());
-		pDeviceContext->IASetInputLayout(m_pEffectVehicle->GetInputLayout());
+		pDeviceContext->IASetInputLayout(m_pEffect->GetInputLayout());
 
 		//3. SetVertexBuffer
 		constexpr UINT stride = sizeof(Vertex_PosCol);
@@ -104,11 +108,11 @@ namespace dae
 		//renderTriangle
 		D3DX11_TECHNIQUE_DESC techDesc{};
 		//m_pEffect->GetTechniquePointer()->GetDesc(&techDesc);
-		m_pEffectVehicle->GetTechniquePointer()->GetDesc(&techDesc);
+		m_pEffect->GetTechniquePointer()->GetDesc(&techDesc);
 		for (UINT p = 0; p < techDesc.Passes; ++p)
 		{
 			//m_pEffect->GetTechniquePointer()->GetPassByIndex(p)->Apply(0, pDeviceContext);
-			m_pEffectVehicle->GetTechniquePointer()->GetPassByIndex(p)->Apply(0, pDeviceContext);
+			m_pEffect->GetTechniquePointer()->GetPassByIndex(p)->Apply(0, pDeviceContext);
 
 			pDeviceContext->DrawIndexed(m_NumIndices, 0, 0);
 		}
@@ -118,7 +122,7 @@ namespace dae
 	{
 		Texture* diffuseMap = Texture::LoadFromFile(m_pDevice, diffuse);
 		//m_pEffect->SetDiffuseMap(diffuseMap);
-		m_pEffectVehicle->SetDiffuseMap(diffuseMap);
+		m_pEffect->SetDiffuseMap(diffuseMap);
 		delete diffuseMap;
 	}
 
@@ -126,7 +130,7 @@ namespace dae
 	{
 		Texture* normalMap = Texture::LoadFromFile(m_pDevice, normal);
 		//m_pEffect->SetNormalMap(normalMap);
-		m_pEffectVehicle->SetNormalMap(normalMap);
+		m_pEffect->SetNormalMap(normalMap);
 		delete normalMap;
 	}
 
@@ -134,7 +138,7 @@ namespace dae
 	{
 		Texture* specularMap = Texture::LoadFromFile(m_pDevice, specular);
 		//m_pEffect->SetSpecularMap(specularMap);
-		m_pEffectVehicle->SetSpecularMap(specularMap);
+		m_pEffect->SetSpecularMap(specularMap);
 		delete specularMap;
 	}
 
@@ -142,7 +146,7 @@ namespace dae
 	{
 		Texture* glossinessMap = Texture::LoadFromFile(m_pDevice, gloss);
 		//m_pEffect->SetGlossinessMap(glossinessMap);
-		m_pEffectVehicle->SetGlossinessMap(glossinessMap);
+		m_pEffect->SetGlossinessMap(glossinessMap);
 		delete glossinessMap;
 	}
 

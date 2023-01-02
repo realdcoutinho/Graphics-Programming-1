@@ -132,24 +132,65 @@ VS_OUTPUT VS(VS_INPUT input)
 //--------------------------------
 // Pixel Shader
 //--------------------------------
-float4 PS(VS_OUTPUT input) : SV_TARGET //change name in PS.
+
+float4 PS_Point(VS_OUTPUT input) : SV_TARGET //change name in PS.
 {
-	input.Color = gDiffuseMap.Sample(MeshTextureSampler, input.TextureUV);
-	return float4(input.Color, 1.0f);
+	return gDiffuseMap.Sample(MeshTextureSamplerPoint, input.TextureUV);
 }
+
+float4 PS_Linear(VS_OUTPUT input) : SV_TARGET
+{
+	return gDiffuseMap.Sample(MeshTextureSamplerPoint, input.TextureUV);
+
+}
+
+float4 PS_Anisotropic(VS_OUTPUT input) : SV_TARGET
+{
+	return gDiffuseMap.Sample(MeshTextureSamplerPoint, input.TextureUV);
+
+}
+
 
 //--------------------------------
 // Technique
 //--------------------------------
-technique11 DefaultTechnique
+
+technique11 TechniquePoint
 {
 	pass p0
 	{
 		SetRasterizerState(gRasterizerState);
-		//SetDepthStencilState(gDepthStencilState, 0);
+		SetDepthStencilState(gDepthStencilState, 0);
 		SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
 		SetVertexShader(CompileShader(vs_5_0, VS()));
 		SetGeometryShader(NULL);
-		SetPixelShader(CompileShader(ps_5_0, PS()));
+		SetPixelShader(CompileShader(ps_5_0, PS_Point()));
+	}
+}
+
+technique11 TechniqueLinear
+{
+	pass p0
+	{
+		SetRasterizerState(gRasterizerState);
+		SetDepthStencilState(gDepthStencilState, 0);
+		SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+		SetVertexShader(CompileShader(vs_5_0, VS()));
+		SetGeometryShader(NULL);
+		SetPixelShader(CompileShader(ps_5_0, PS_Linear()));
+	}
+}
+
+technique11 TechniqueAnsotropic
+{
+	pass p0
+	{
+		SetRasterizerState(gRasterizerState);
+		SetDepthStencilState(gDepthStencilState, 0);
+		SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+		SetRasterizerState(gRasterizerState);
+		SetVertexShader(CompileShader(vs_5_0, VS()));
+		SetGeometryShader(NULL);
+		SetPixelShader(CompileShader(ps_5_0, PS_Anisotropic()));
 	}
 }

@@ -18,7 +18,7 @@ namespace dae
 		Mesh& operator=(Mesh&&) noexcept = delete;
 
 
-		void Update(const Timer* pTimer, Camera *camera);
+		void Update(const Timer* pTimer, Camera *camera, bool isRotating, bool isToggling);
 		void Render(ID3D11DeviceContext* pDeviceContext) const;
 		void ToggleTextures() const;
 
@@ -32,8 +32,10 @@ namespace dae
 		float m_Yawn;
 		float m_RotationSpeed{ 1.0f };
 
+		const uint8_t* m_pKeyboardState = SDL_GetKeyboardState(nullptr);
+
 		//Effect* m_pEffect;
-		EffectVehicle* m_pEffectVehicle;
+		EffectVehicle* m_pEffect;
 
 		ID3D11Device* m_pDevice;
 		//std::vector<Vertex_Input> m_Vertices;

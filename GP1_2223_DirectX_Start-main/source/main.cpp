@@ -15,6 +15,7 @@ void ShutDown(SDL_Window* pWindow)
 	SDL_Quit();
 }
 
+
 int main(int argc, char* args[])
 {
 	//Unreferenced parameters
@@ -59,7 +60,9 @@ int main(int argc, char* args[])
 				//Test for a key
 				//if (e.key.keysym.scancode == SDL_SCANCODE_X)
 				if (e.key.keysym.scancode == SDL_SCANCODE_F2)
-					pRenderer->ToggleTextures();
+					pRenderer->ToggleTechnique();
+				if (e.key.keysym.scancode == SDL_SCANCODE_F5)
+					pRenderer->ToggleRotation();
 				break;
 			default: ;
 			}

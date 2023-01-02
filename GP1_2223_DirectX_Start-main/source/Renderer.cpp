@@ -4,7 +4,8 @@
 namespace dae {
 
 	Renderer::Renderer(SDL_Window* pWindow) :
-		m_pWindow(pWindow)
+		m_pWindow(pWindow),
+		m_IsRotationOn{true}
 	{
 		//Initialize
 		SDL_GetWindowSize(pWindow, &m_Width, &m_Height);	
@@ -107,8 +108,9 @@ namespace dae {
 	void Renderer::Update(const Timer* pTimer)
 	{
 		m_Camera->Update(pTimer->GetElapsed());
-		m_pVehicleMesh->Update(pTimer, m_Camera);
-		m_pFireMesh->Update(pTimer, m_Camera);
+		m_pVehicleMesh->Update(pTimer, m_Camera, m_IsRotationOn, m_ToggleTechnique);
+		m_pFireMesh->Update(pTimer, m_Camera, m_IsRotationOn, m_ToggleTechnique);
+		m_ToggleTechnique = false;
 	}
 
 
@@ -125,8 +127,6 @@ namespace dae {
 		//2. SET PIPELINE + INVOKE DRAWCALLS (= RENDER)
 		//...
 
-		Matrix worldMatrix = Matrix::CreateTranslation({0.0f, 0.0f, 0.f});
-		Matrix invViewMatrix = m_Camera->GetInvViewMatrix();
 		m_pVehicleMesh->Render(m_pDeviceContext);
 		m_pFireMesh->Render(m_pDeviceContext);
 		
@@ -274,11 +274,6 @@ namespace dae {
 		if (m_pTargetRenderView)
 			m_pTargetRenderView->Release();
 
-	}
-
-	void Renderer::ToggleTextures() const
-	{
-		
 	}
 }
 

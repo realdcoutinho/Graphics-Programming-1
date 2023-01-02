@@ -20,9 +20,11 @@ namespace dae
 
 		void Update(const Timer* pTimer);
 		void Render() const;
-		void ToggleTextures() const;
+		void ToggleTechnique() { m_ToggleTechnique = !m_ToggleTechnique; };
 
 		//void Render_W1() const;
+
+		void ToggleRotation() { m_IsRotationOn = !m_IsRotationOn; };
 
 	private:
 		void InitializeVehicle();
@@ -33,6 +35,9 @@ namespace dae
 
 		int m_Width{};
 		int m_Height{};
+
+		bool m_IsRotationOn;
+		bool m_ToggleTechnique;
 
 		bool m_IsInitialized{ false };
 		Matrix m_ViewMatrix;
