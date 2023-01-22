@@ -3,7 +3,9 @@
 
 namespace dae
 {
-	Render_Base::Render_Base(SDL_Window* pWindow) :
+	Render_Base::Render_Base(SDL_Window* pWindow, Camera& camera, Mesh* mesh) :
+		m_Camera			{camera},
+		m_pVehicleMesh		{mesh},
 		m_pWindow(pWindow),
 		m_IsRotationOn		{ true },
 		m_IsUniformColorOn	{false},
@@ -11,7 +13,6 @@ namespace dae
 		m_Yawn				{0},
 		m_RotationSpeed		{1},
 		m_Origin			{0.0f, 0.0f, 0.0f},
-		m_VehiclePath		{ "Resources/Vehicle.obj" },
 		m_DiffusePath		{ "Resources/vehicle_diffuse.png" },
 		m_NormalPath		{ "Resources/vehicle_normal.png" },
 		m_SpecularPath		{ "Resources/vehicle_specular.png" },
@@ -19,13 +20,6 @@ namespace dae
 	{
 		//Initialize
 		SDL_GetWindowSize(pWindow, &m_Width, &m_Height);
-
-		//Initialize Camera
-		m_AspectRatio = static_cast<float>(m_Width) / static_cast<float>(m_Height);
-		m_Camera.Initialize(m_AspectRatio, m_FOV, m_Origin);
-		m_Camera.CalculateViewMatrix();
-
-		InitializeVehicle();
 	}
 
 	Render_Base::~Render_Base()
@@ -43,11 +37,6 @@ namespace dae
 			m_Yawn += pTimer->GetElapsed() * m_RotationSpeed;
 	}
 
-	void Render_Base::InitializeVehicle()
-	{
-		m_pVehicleMesh = new Mesh(m_VehiclePath);
-	}
-
 	void Render_Base::ToggleRotation() 
 	{
 		m_IsRotationOn = !m_IsRotationOn;
@@ -61,7 +50,6 @@ namespace dae
 		{
 			SetConsoleTextAttribute(h, 6);
 			std::cout << "**(SHARED) Vehicle Rotation Off" << '\n';
-
 		}
 	}
 

@@ -9,7 +9,7 @@
 
 namespace dae
 {
-	struct Camera
+	struct Camera final
 	{
 		Camera() = default;
 
@@ -19,6 +19,9 @@ namespace dae
 		{
 		}
 
+
+		int width;
+		int height;
 
 		Vector3 origin{};
 		float fovAngle{ 90.f };
@@ -104,12 +107,12 @@ namespace dae
 
 		void Update(const Timer* pTimer)
 		{
-			const float deltaTime = pTimer->GetElapsed();
+			//const float deltaTime = pTimer->GetElapsed();
 
 			//Camera Update Logic
 			//...
-			KeyboardInput(deltaTime);
-			MouseInput(deltaTime);
+			MouseInput(pTimer);
+			KeyboardInput(pTimer);
 
 
 			//Update Matrices
@@ -118,20 +121,20 @@ namespace dae
 
 		}
 
-		void KeyboardInput(float deltaTime)
+		void KeyboardInput(const Timer* pTimer)
 		{
 			const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
 
 			if (pKeyboardState[SDL_SCANCODE_W] || pKeyboardState[SDL_SCANCODE_S] || pKeyboardState[SDL_SCANCODE_D] || pKeyboardState[SDL_SCANCODE_A])
 			{
-				origin += forward * cameraVelocity * deltaTime * pKeyboardState[SDL_SCANCODE_W];
-				origin += forward * cameraVelocity * -deltaTime * pKeyboardState[SDL_SCANCODE_S];
-				origin += right * cameraVelocity * deltaTime * pKeyboardState[SDL_SCANCODE_D];
-				origin += right * cameraVelocity * -deltaTime * pKeyboardState[SDL_SCANCODE_A];
+				origin += forward * cameraVelocity * pTimer->GetElapsed() * pKeyboardState[SDL_SCANCODE_W];
+				origin += forward * cameraVelocity * -pTimer->GetElapsed() * pKeyboardState[SDL_SCANCODE_S];
+				origin += right * cameraVelocity * pTimer->GetElapsed() * pKeyboardState[SDL_SCANCODE_D];
+				origin += right * cameraVelocity * -pTimer->GetElapsed() * pKeyboardState[SDL_SCANCODE_A];
 			}
 		}
 
-		void MouseInput(float deltaTime)
+		void MouseInput(const Timer* pTimer)
 		{
 			int mouseX{}, mouseY{};
 			const uint32_t mouseState = SDL_GetRelativeMouseState(&mouseX, &mouseY);
@@ -143,22 +146,22 @@ namespace dae
 			{
 				if (leftMouse && rightMouse)
 				{
-					origin += Vector3::UnitY * -deltaTime * static_cast<float>(mouseY) * cameraVelocity;
-					std::cout << "Both" << '\n';
-					std::cout << origin.x << "     " << origin.y << '\n';
+					origin += Vector3::UnitY * -pTimer->GetElapsed() * static_cast<float>(mouseY) * cameraVelocity;
+					/*std::cout << "Both" << '\n';
+					std::cout << origin.x << "     " << origin.y << '\n';*/
 					return;
 				}
-				origin += forward * -deltaTime * static_cast<float>(mouseY) * cameraVelocity * leftMouse;
+				origin += forward * -pTimer->GetElapsed() * static_cast<float>(mouseY) * cameraVelocity * leftMouse;
 
-				totalYaw += deltaTime * static_cast<float>(mouseX) * leftMouse;
-				totalYaw += deltaTime * static_cast<float>(mouseX) * rightMouse;
+				totalYaw += pTimer->GetElapsed() * static_cast<float>(mouseX) * leftMouse;
+				totalYaw += pTimer->GetElapsed() * static_cast<float>(mouseX) * rightMouse;
 
-				totalPitch += -deltaTime * static_cast<float>(mouseY) * rightMouse;
+				totalPitch += -pTimer->GetElapsed() * static_cast<float>(mouseY) * rightMouse;
 
 				const Matrix finalRotation{ Matrix::CreateRotation(totalPitch, totalYaw, 0) };
 				forward = finalRotation.TransformVector(Vector3::UnitZ);
 
-				std::cout << origin.x << "     " << origin.y << '\n';
+				//std::cout << origin.x << "     " << origin.y << '\n';
 			}
 		}
 

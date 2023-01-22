@@ -101,12 +101,12 @@ struct VS_INPUT
 struct VS_OUTPUT
 {
 	float4 Position			: SV_POSITION;
-	float3 Color			: COLOR;
+	float3 WorldPosition	: COLOR;
 	float3 Normal			: NORMAL;
 	float3 Tangent			: TANGENT;
 	float2 TextureUV		: TEXCOORD;
 
-	float4 WorldPosition: WORLDPOSITION;
+	//float4 WorldPosition: WORLDPOSITION;
 
 };
 

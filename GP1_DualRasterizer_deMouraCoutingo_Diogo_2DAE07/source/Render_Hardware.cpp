@@ -3,8 +3,8 @@
 
 namespace dae {
 
-	Render_Hardware::Render_Hardware(SDL_Window* pWindow) :
-		Render_Base(pWindow),
+	Render_Hardware::Render_Hardware(SDL_Window* pWindow, Camera& camera, Mesh* mesh) :
+		Render_Base(pWindow, camera, mesh),
 		m_IsFireOn{true},
 		m_IsInitialized{false},
 		m_ToggleTechnique{false}
@@ -58,8 +58,6 @@ namespace dae {
 	Render_Hardware::~Render_Hardware()
 	{
 		FixResourceLeaks();
-		//delete m_Camera;
-		delete m_pVehicleMesh;
 		delete m_pFireMesh;
 	}
 

@@ -17,8 +17,8 @@
 using namespace dae;
 using namespace Utils;
 
-	Render_Software::Render_Software(SDL_Window* pWindow) :
-		Render_Base(pWindow),
+	Render_Software::Render_Software(SDL_Window* pWindow, Camera& camera, Mesh* mesh) :
+		Render_Base(pWindow, camera, mesh),
 		 m_IsNormalMapOn{ true },
 		 m_IsParallelOn{ true },
 		 m_IsDepthBufferOn{ false },
@@ -26,7 +26,6 @@ using namespace Utils;
 		 m_IsTextureOn{ true }
 	{
 		CreateBuffers(pWindow);
-		InitializeVehicle();
 		InitializeTextures();
 		InitializeLights();
 
@@ -69,8 +68,6 @@ using namespace Utils;
 			SDL_FillRect(m_pBackBuffer, NULL, SDL_MapRGB(m_pBackBuffer->format, static_cast<Uint8>(99.45f) , static_cast<Uint8>(99.45f), static_cast<Uint8>(99.45f)));
 		}
 
-
-
 		//@START
 		//Lock BackBuffer
 		SDL_LockSurface(m_pBackBuffer);
@@ -94,31 +91,16 @@ using namespace Utils;
 		VertexTransformationFunction(meshes);
 		for (const MeshStruct& mesh : meshes)
 		{
-			if (m_IsParallelOn)
+			
+			const uint32_t amountOfTriangles = (static_cast<uint32_t>(m_pVehicleMesh->m_Indices.size()) / 3);
+			concurrency::parallel_for(static_cast<uint32_t>(0), amountOfTriangles, [=, this](int index)
 			{
-				const uint32_t amountOfTriangles = ((uint32_t)mesh.indices.size()) / 3;
-				concurrency::parallel_for(static_cast<uint32_t>(0), amountOfTriangles, [=, this](int index)
-				{
-					Vertex_Out v0 = mesh.vertices_out[mesh.indices[3 * index]];
-					Vertex_Out v1 = mesh.vertices_out[mesh.indices[3 * index + 1]];
-					Vertex_Out v2 = mesh.vertices_out[mesh.indices[3 * index + 2]];
+				Vertex_Out v0 = mesh.vertices_out[m_pVehicleMesh->m_Indices[3 * index]];
+				Vertex_Out v1 = mesh.vertices_out[m_pVehicleMesh->m_Indices[3 * index + 1]];
+				Vertex_Out v2 = mesh.vertices_out[m_pVehicleMesh->m_Indices[3 * index + 2]];
 	
-					RenderTriangleW4(v0, v1, v2);
-				});
-			}
-			else
-			{
-				int indicesSizeArray{ static_cast<int>(mesh.indices.size()) };
-				for (int indicesIndex{}; indicesIndex < indicesSizeArray; ++indicesIndex)
-				{
-					Vertex_Out v0 = mesh.vertices_out[mesh.indices[indicesIndex]];
-					Vertex_Out v1 = mesh.vertices_out[mesh.indices[++indicesIndex]];
-					Vertex_Out v2 = mesh.vertices_out[mesh.indices[++indicesIndex]];
-	
-	
-					RenderTriangleW4(v0, v1, v2);
-				}
-			}
+				RenderTriangleW4(v0, v1, v2);
+			});
 		}
 	}
 
@@ -138,7 +120,7 @@ void Render_Software::VertexTransformationFunction(std::vector<MeshStruct>& mesh
 		worlViewProjectionMatrix = mesh.worldMatrix * m_Camera.worldViewProjectionMatrix;
 
 		mesh.vertices_out.clear();
-		for (auto& vertex : mesh.vertices)
+		for (auto& vertex : m_pVehicleMesh->GetVertices())
 		{
 			//okay, so here I am transforming the normals of each vertice
 			vertex.normal = mesh.worldMatrix.TransformVector(vertex.normal).Normalized();
@@ -220,7 +202,7 @@ void Render_Software::RenderTriangleW4(Vertex_Out& v0, Vertex_Out& v1, Vertex_Ou
 	switch (m_CullMode)
 	{
 	case CullMode::Front:
-		if (area < 0) // if area is negative, we are looking at the back of the triangle, hence, do not render
+		if (area <= 0) // if area is negative, we are looking at the back of the triangle, hence, do not render
 			return;
 		break;
 	case CullMode::Back:
@@ -351,9 +333,6 @@ ColorRGB Render_Software::PixelShading(const Vertex_Out& v) const
 	//create a phong material
 	ColorRGB phong{ Utils::Phong(specularMap, phongExponent, m_Light.direction, -v.viewDirection, v.normal)};
 
-
-
-
 	switch (m_ShadingMode)
 	{
 	case ShadingMode::Combined:
@@ -392,15 +371,6 @@ void Render_Software::InitializeTextures()
 	m_pSpecular = Texture::LoadFromFile(m_SpecularPath);
 	m_pGloss = Texture::LoadFromFile(m_GlossPath);
 }
-
-void Render_Software::InitializeVehicle()
-{
-	//Mesh
-	m_MeshVehicle.vertices = m_pVehicleMesh->GetVertices();
-	m_MeshVehicle.indices = m_pVehicleMesh->GetIndices();
-	m_MeshVehicle.primitiveTopology = PrimitiveTopology::TriangleList;
-}
-
 
 void Render_Software::ToggleShadingMode()
 {

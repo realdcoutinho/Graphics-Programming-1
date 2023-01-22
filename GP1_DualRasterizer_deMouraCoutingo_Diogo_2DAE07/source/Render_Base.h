@@ -10,7 +10,7 @@ namespace dae
 	class Render_Base
 	{
 	public:
-		Render_Base(SDL_Window* pWindow);
+		Render_Base(SDL_Window* pWindow, Camera& camera, Mesh* mesh);
 		virtual ~Render_Base();
 
 		Render_Base(const Render_Base&) = delete;
@@ -50,12 +50,10 @@ namespace dae
 		SDL_Window* m_pWindow{};
 
 		//comomn to both modes so information kpet ion the base render
-		const std::string m_VehiclePath;
 		const std::string m_DiffusePath;
 		const std::string m_NormalPath;
 		const std::string m_SpecularPath;
 		const std::string m_GlossPath;
-		void InitializeVehicle();
 	};
 }
 

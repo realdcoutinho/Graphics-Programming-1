@@ -155,48 +155,6 @@ namespace dae
 		return m_pMatInverseViewMatrixVariable;
 	}
 
-	//void EffectBase::ToggleSamplerTechnique()
-	//{
-	//	////const uint8_t* pKeyboardState = SDL_GetKeyboardState(nullptr);
-	//	////auto keyState = pKeyboardState[SDL_SCANCODE_F2];
-	//	////if (keyState)
-	//	////{
-	//	//	switch (m_SamplerTechnique) {
-	//	//	case samplerTechnique::Point:
-	//	//		m_SamplerTechnique = samplerTechnique::Linear;
-	//	//		m_pTechnique->Release();
-	//	//		m_pTechnique = m_pEffect->GetTechniqueByName("TechniquePoint");
-	//	//		if (!m_pTechnique->IsValid())
-	//	//		{
-	//	//			std::wcout << L"Technique is not valid" << '\n';
-	//	//		}
-	//	//		std::wcout << L"Technique is Point" << '\n';
-	//	//		break;
-	//	//	case samplerTechnique::Linear:
-	//	//		m_SamplerTechnique = samplerTechnique::Anisotropic;
-	//	//		m_pTechnique->Release();
-	//	//		m_pTechnique = m_pEffect->GetTechniqueByName("TechniqueLinear");
-	//	//		if (!m_pTechnique->IsValid())
-	//	//		{
-	//	//			std::wcout << L"Technique is not valid" << '\n';
-	//	//		}
-	//	//		std::wcout << "Technique is Linear" << '\n';
-	//	//		break;
-	//	//	case samplerTechnique::Anisotropic:
-	//	//		m_SamplerTechnique = samplerTechnique::Point;
-	//	//		m_pTechnique->Release();
-	//	//		m_pTechnique = m_pEffect->GetTechniqueByName("TechniqueAnsotropic");
-	//	//		if (!m_pTechnique->IsValid())
-	//	//		{
-	//	//			std::wcout << L"Technique is not valid" << '\n';
-	//	//		}
-	//	//		std::wcout << L"Technique is Ansotropic" << '\n';
-	//	//		break;
-	//	//	}
-	//	////}
-	//}
-
-
 	static ID3DX11Effect* LoadEffect(ID3D11Device* pDevice, const std::wstring& assetFile)
 	{
 		HRESULT result;

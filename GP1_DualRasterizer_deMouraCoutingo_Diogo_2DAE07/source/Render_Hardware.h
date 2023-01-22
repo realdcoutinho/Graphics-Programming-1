@@ -9,10 +9,10 @@ class Effect;
 
 namespace dae
 {
-	class Render_Hardware : public Render_Base
+	class Render_Hardware final : public Render_Base 
 	{
 	public:
-		Render_Hardware(SDL_Window* pWindow);
+		Render_Hardware(SDL_Window* pWindow, Camera& camera, Mesh* mesh);
 		~Render_Hardware();
 
 		Render_Hardware(const Render_Hardware&) = delete;

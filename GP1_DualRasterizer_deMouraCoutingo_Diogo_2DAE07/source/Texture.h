@@ -5,7 +5,7 @@
 
 namespace dae
 {
-	class Texture
+	class Texture final
 	{
 	public:
 		~Texture();

@@ -37,15 +37,19 @@ namespace dae
 		EffectBase* GetEffect() const;
 		
 
+		std::vector<Vertex> m_Vertices;
+		std::vector<uint32_t> m_Indices;
+		uint32_t m_NumIndices;
+
 	private:
 		float m_Yawn;
 		float m_RotationSpeed{ 1.0f };
 
-		const uint8_t* m_pKeyboardState = SDL_GetKeyboardState(nullptr);
+	/*	const uint8_t* m_pKeyboardState = SDL_GetKeyboardState(nullptr);*/
 
-		std::vector<Vertex> m_Vertices;
-		std::vector<uint32_t> m_Indices;
-		uint32_t m_NumIndices;
+		//std::vector<Vertex> m_Vertices;
+		//std::vector<uint32_t> m_Indices;
+		//uint32_t m_NumIndices;
 
 
 		EffectBase* m_pEffectBase;

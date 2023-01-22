@@ -7,6 +7,7 @@
 #undef main
 #include "Render_Hardware.h"
 #include "Render_Software.h"
+#include "Scene.h"
 #include <windows.h>
 
 
@@ -18,32 +19,9 @@ void ShutDown(SDL_Window* pWindow)
 	SDL_Quit();
 }
 
-void PrintInitialMessage()
+void KeyBoardInput(bool loops)
 {
-	HANDLE  h = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	SetConsoleTextAttribute(h, 6);
-	std::cout << "[Key Bindings - SHARED]" << '\n';
-	std::cout << "	[F1] Toggle Rasterizer Mode(HARDWARE / SOFTWARE)"  << '\n';
-	std::cout << "	[F2]  Toggle Vehicle Rotation(ON / OFF)" << '\n';
-	std::cout << "	[F9]  Cycle CullMode(BACK / FRONT / NONE) "<< '\n';
-	std::cout << "	[F10] Toggle Uniform ClearColor(ON / OFF)" << '\n';
-	std::cout << "	[F11] Toggle Print FPS(ON / OFF)" << '\n';
-
-	SetConsoleTextAttribute(h, 2);
-	std::cout << "[Key Bindings - HARDWARE]" << '\n';
-	std::cout << "	[F3] Toggle FireFX(ON / OFF)" << '\n';
-	std::cout << "	[F4] Cycle Sampler State(POINT / LINEAR / ANISOTROPIC)" << '\n';
-
-	SetConsoleTextAttribute(h, 5);
-	std::cout << "[Key Bindings - SOFTWARE]" << '\n';
-	std::cout << "	[F5] Cycle Shading Mode(COMBINED / OBSERVED_AREA / DIFFUSE / SPECULAR)" << '\n';
-	std::cout << "	[F6] Toggle NormalMap(ON / OFF)" << '\n';
-	std::cout << "	[F7] Toggle DepthBuffer Visualization(ON / OFF)" << '\n';
-	std::cout << "	[F8] Toggle BoundingBox Visualization(ON / OFF)" << '\n';
-	std::cout << '\n';
-
-	SetConsoleTextAttribute(h, 15);
 }
 
 
@@ -69,10 +47,11 @@ int main(int argc, char* args[])
 	if (!pWindow)
 		return 1;
 
-	//Initialize "framework"
+
 	const auto pTimer = new Timer();
-	const auto pRenderHardware = new Render_Hardware(pWindow);
-	const auto pRenderSoftware = new Render_Software(pWindow);
+	const auto pScene = new Scene(pWindow);
+	const auto pRenderHardware = new Render_Hardware(pWindow, pScene->GetCamera(), pScene->GetMesh());
+	const auto pRenderSoftware = new Render_Software(pWindow, pScene->GetCamera(), pScene->GetMesh());
 
 	bool isF1{ true };
 	bool printFPS{ false };
@@ -82,8 +61,6 @@ int main(int argc, char* args[])
 	pTimer->Start();
 	float printTimer = 0.f;
 	bool isLooping = true;
-
-	PrintInitialMessage();
 
 	HANDLE  h = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -192,8 +169,16 @@ int main(int argc, char* args[])
 			}
 		}
 
+		SetConsoleTextAttribute(h, 15);
 		//--------- Update ---------
-
+			
+		//	//***
+		//	//MOUSE INPUT FOR SOFTWARE
+		//pRenderSoftware->Update(pTimer);
+		//pRenderHardware->Update(pTimer);
+		
+			//***
+			//MOUSE INPUT FOR HARDWARE
 		pRenderHardware->Update(pTimer);
 		pRenderSoftware->Update(pTimer);
 
@@ -202,12 +187,10 @@ int main(int argc, char* args[])
 		//--------- Render ---------
 		if (isF1)
 		{
-			
 			pRenderHardware->Render();
 		}
 		else
 		{
-
 			pRenderSoftware->Render();
 		}
 
@@ -226,9 +209,11 @@ int main(int argc, char* args[])
 	}
 	pTimer->Stop();
 
+	SetConsoleTextAttribute(h, 15);
 	//Shutdown "framework"
 	delete pRenderHardware;
 	delete pRenderSoftware;
+	delete pScene;
 	delete pTimer;
 
 	ShutDown(pWindow);

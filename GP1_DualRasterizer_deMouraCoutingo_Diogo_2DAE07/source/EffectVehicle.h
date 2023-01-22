@@ -2,7 +2,7 @@
 #include "EffectBase.h"
 namespace dae
 {
-	class EffectVehicle : public EffectBase
+	class EffectVehicle final : public EffectBase
 	{
 	public:
 		EffectVehicle(ID3D11Device* pDevice, const std::wstring& assetFile); //assetFile == path that determines which effect to load

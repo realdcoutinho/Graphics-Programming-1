@@ -59,21 +59,12 @@ namespace dae
 
 	Mesh::~Mesh()
 	{
-		//delete m_pEffect;
 		delete m_pEffectBase;
 	}
 
 	void Mesh::Update(Camera camera, bool isToggling, float yawn)
 	{
-		//m_pEffect->ToggleSamplerTechnique();
-		//if (isToggling)
-		//{
-		//	m_pEffectBase->ToggleSamplerTechnique();
-		//}
-		//
 		m_pEffectBase->SetTechnique();
-
-		//m_Yawn += pTimer->GetElapsed() * m_RotationSpeed * !(m_pKeyboardState[SDL_SCANCODE_F5]);
 		Matrix rotationMatrix = Matrix::CreateRotationY(yawn);
 		Matrix translationMatrix = Matrix::CreateTranslation({ 0.0f, 0.0f, 50.0f });
 		Matrix TR = rotationMatrix * translationMatrix;

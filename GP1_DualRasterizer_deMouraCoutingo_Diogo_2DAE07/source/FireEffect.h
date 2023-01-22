@@ -3,7 +3,7 @@
 
 namespace dae
 {
-	class FireEffect : public EffectBase
+	class FireEffect final : public EffectBase
 	{
 	public:
 		FireEffect(ID3D11Device* pDevice, const std::wstring& assetFile); //assetFile == path that determines which effect to load

@@ -10,20 +10,12 @@
 struct SDL_Window;
 struct SDL_Surface;
 
-////foward declarations
-//class Texture;
-//struct MeshStruct;
-//struct Vertex;
-//class Timer;
-//class Scene;
-
-
 namespace dae
 {
-	class Render_Software : public Render_Base
+	class Render_Software final : public Render_Base
 	{
 	public:
-		Render_Software(SDL_Window* pWindow);
+		Render_Software(SDL_Window* pWindow, Camera& camera, Mesh* mesh);
 		~Render_Software();
 
 		Render_Software(const Render_Software&) = delete;
@@ -41,10 +33,6 @@ namespace dae
 		void ToggleCullMode();
 		void ToggleNormalMap();
 		
-		//void ToggleNormalMap() { m_IsNormalMapOn = !m_IsNormalMapOn; };
-
-
-
 	private:
 
 		enum class ShadingMode
@@ -86,10 +74,8 @@ namespace dae
 		bool m_IsBoundingBoxOn;
 		bool m_IsTextureOn;
 
-
 		void CreateBuffers(SDL_Window* pWindow);
 		void InitializeTextures();
-		void InitializeVehicle();
 		void InitializeLights();
 		void RenderTriangleW4(Vertex_Out& v0, Vertex_Out& v1, Vertex_Out& v2) const;
 		void VertexTransformationFunction(std::vector<MeshStruct>& mesh) const;
