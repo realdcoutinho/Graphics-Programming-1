@@ -44,7 +44,7 @@ BlendState gBlendState
 DepthStencilState gDepthStencilState
 {
 	DepthEnable = true;
-	DepthWriteMask = zero;
+	DepthWriteMask = true;
 	DepthFunc = less;
 	StencilEnable = false;
 
